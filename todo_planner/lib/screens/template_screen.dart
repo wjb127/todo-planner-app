@@ -204,6 +204,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -223,6 +224,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -349,33 +351,38 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     ],
                   ),
                   child: _templateItems.isEmpty
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.assignment_outlined,
-                                size: 64,
-                                color: Colors.grey.shade400,
+                      ? SingleChildScrollView(
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.assignment_outlined,
+                                    size: 64,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    '템플릿에 습관을 추가해보세요!',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '매일 반복할 루틴을 만들어보세요',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 16),
-                              Text(
-                                '템플릿에 습관을 추가해보세요!',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '매일 반복할 루틴을 만들어보세요',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         )
                       : ReorderableListView.builder(

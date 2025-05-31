@@ -3,15 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/template_screen.dart';
 import 'screens/daily_screen.dart';
 import 'screens/statistics_screen.dart';
+import 'screens/settings_screen.dart';
 import 'services/ad_service.dart';
 import 'services/purchase_service.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 애드몹과 인앱결제 초기화
+  // 애드몹, 인앱결제, 알림 초기화
   await AdService.initialize();
   await PurchaseService.initialize();
+  await NotificationService.initialize();
   
   runApp(const TodoPlannerApp());
 }
@@ -151,6 +154,24 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('습관메이커'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+            icon: const Icon(Icons.settings_rounded),
+            tooltip: '설정',
+          ),
+        ],
+      ),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,

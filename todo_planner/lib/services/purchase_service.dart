@@ -9,6 +9,7 @@ import 'ad_service.dart';
 
 class PurchaseService {
   static const String removeAdsProductId = 'remove_ads_11000'; // 실제 상품 ID로 변경 필요
+  static const bool isDevelopmentMode = true; // 개발 모드 (배포시 false로 변경)
   
   static final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   static late StreamSubscription<List<PurchaseDetails>> _subscription;
@@ -17,6 +18,12 @@ class PurchaseService {
 
   // 인앱결제 초기화
   static Future<void> initialize() async {
+    if (isDevelopmentMode) {
+      print('Development mode: In-app purchase simulation enabled');
+      _isAvailable = true;
+      return;
+    }
+    
     _isAvailable = await _inAppPurchase.isAvailable();
     
     if (!_isAvailable) {
@@ -61,6 +68,15 @@ class PurchaseService {
 
   // 광고 제거 구매
   static Future<void> purchaseRemoveAds() async {
+    if (isDevelopmentMode) {
+      // 개발 모드: 가짜 구매 시뮬레이션
+      print('Development mode: Simulating purchase...');
+      await Future.delayed(const Duration(seconds: 1));
+      await AdService.setAdRemoved(true);
+      print('Development mode: Purchase completed successfully');
+      return;
+    }
+    
     if (!_isAvailable || _products.isEmpty) {
       print('Purchase not available or products not loaded');
       return;
@@ -107,11 +123,23 @@ class PurchaseService {
 
   // 구매 복원 (사용자가 직접 호출)
   static Future<void> restorePurchases() async {
+    if (isDevelopmentMode) {
+      // 개발 모드: 가짜 복원 시뮬레이션
+      print('Development mode: Simulating restore...');
+      await Future.delayed(const Duration(seconds: 1));
+      print('Development mode: Restore completed');
+      return;
+    }
+    
     await _restorePurchases();
   }
 
   // 상품 가격 가져오기
   static String getRemoveAdsPrice() {
+    if (isDevelopmentMode) {
+      return '₩11,000'; // 개발 모드에서는 고정 가격
+    }
+    
     if (_products.isEmpty) return '₩11,000';
     
     final product = _products.firstWhere(

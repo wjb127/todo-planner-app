@@ -142,22 +142,40 @@ class _DailyScreenState extends State<DailyScreen> {
               // Header
               Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Column(
+                child: Row(
                   children: [
-                    const Text(
-                      '일일 습관 체크',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            '일일 습관 체크',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '오늘의 습관을 확인하고 체크하세요',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '오늘의 습관을 확인하고 체크하세요',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: _loadDailyData,
+                        icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                        tooltip: '새로고침',
                       ),
                     ),
                   ],
@@ -344,13 +362,30 @@ class _DailyScreenState extends State<DailyScreen> {
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    '템플릿을 먼저 설정해주세요',
+                                    '템플릿을 설정하고 새로고침을 눌러주세요',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  const SizedBox(height: 24),
+                                  ElevatedButton.icon(
+                                    onPressed: _loadDailyData,
+                                    icon: const Icon(Icons.refresh_rounded),
+                                    label: const Text('새로고침'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Theme.of(context).colorScheme.primary,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      elevation: 0,
                                     ),
                                   ),
                                 ],

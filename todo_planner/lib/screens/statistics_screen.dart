@@ -183,25 +183,43 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           child: SafeArea(
             child: Column(
               children: [
-                // Header
+                // Header with Refresh Button
                 Padding(
                   padding: const EdgeInsets.all(24.0),
-                  child: Column(
+                  child: Row(
                     children: [
-                      const Text(
-                        '통계',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              '통계',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '습관 완료율과 진행 상황을 확인하세요',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '습관 완료율과 진행 상황을 확인하세요',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white.withOpacity(0.9),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: IconButton(
+                          onPressed: _loadStatistics,
+                          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                          tooltip: '새로고침',
                         ),
                       ),
                     ],
@@ -219,11 +237,27 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '템플릿을 먼저 설정해주세요',
+                          '템플릿을 설정하고 새로고침을 눌러주세요',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.white.withOpacity(0.9),
                             fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton.icon(
+                          onPressed: _loadStatistics,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('새로고침'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white.withOpacity(0.9),
+                            foregroundColor: Theme.of(context).colorScheme.primary,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
                           ),
                         ),
                       ],
