@@ -22,7 +22,7 @@ class TodoPlannerApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Todo Planner',
+      title: '습관메이커',
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -188,12 +188,12 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             BottomNavigationBarItem(
               icon: Icon(Icons.assignment_outlined),
               activeIcon: Icon(Icons.assignment),
-              label: '템플릿',
+              label: '반복 습관',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.today_outlined),
               activeIcon: Icon(Icons.today),
-              label: '일일 체크',
+              label: '일일 습관 체크',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.analytics_outlined),

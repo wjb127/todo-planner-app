@@ -198,7 +198,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '할 일 완료율과 진행 상황을 확인하세요',
+                        '습관 완료율과 진행 상황을 확인하세요',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.white.withOpacity(0.9),
@@ -274,7 +274,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '할 일 완료율과 진행 상황을 확인하세요',
+                            '습관 완료율과 진행 상황을 확인하세요',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
@@ -466,7 +466,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
-                                  '항목별 완료율',
+                                  '항목별 습관 완료율',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -739,7 +739,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                 ),
                                 const SizedBox(height: 16),
                                 const Text(
-                                  '광고 없는 깔끔한 환경에서 Todo를 관리하세요!',
+                                  '광고 없는 깔끔한 환경에서 습관을 관리하세요!',
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,

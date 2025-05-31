@@ -48,7 +48,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
     });
     _textController.clear();
     _saveTemplate();
-    _showSnackBar('할 일이 추가되었습니다.');
+    _showSnackBar('습관이 추가되었습니다.');
   }
 
   void _removeTodoItem(int index) {
@@ -56,7 +56,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
       _templateItems.removeAt(index);
     });
     _saveTemplate();
-    _showSnackBar('할 일이 삭제되었습니다.');
+    _showSnackBar('습관이 삭제되었습니다.');
   }
 
   void _editTodoItem(int index, String newTitle) {
@@ -64,7 +64,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
       _templateItems[index] = _templateItems[index].copyWith(title: newTitle);
     });
     _saveTemplate();
-    _showSnackBar('할 일이 수정되었습니다.');
+    _showSnackBar('습관이 수정되었습니다.');
   }
 
   void _reorderItems(int oldIndex, int newIndex) {
@@ -81,7 +81,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
 
   Future<void> _applyTemplateFromToday() async {
     if (_templateItems.isEmpty) {
-      _showSnackBar('템플릿에 할 일을 먼저 추가해주세요.', isError: true);
+      _showSnackBar('템플릿에 습관을 먼저 추가해주세요.', isError: true);
       return;
     }
 
@@ -135,11 +135,11 @@ class _TemplateScreenState extends State<TemplateScreen> {
     // 결과 메시지
     String message = '';
     if (todayApplied && futureDaysApplied > 0) {
-      message = '✅ 오늘부터 ${futureDaysApplied + 1}일간 새로운 템플릿이 적용되었습니다!';
+      message = '✅ 오늘부터 ${futureDaysApplied + 1}일간 새로운 습관 템플릿이 적용되었습니다!';
     } else if (todaySkipped && futureDaysApplied > 0) {
-      message = '✅ 오늘은 건너뛰고 내일부터 ${futureDaysApplied}일간 새로운 템플릿이 적용되었습니다!';
+      message = '✅ 오늘은 건너뛰고 내일부터 ${futureDaysApplied}일간 새로운 습관 템플릿이 적용되었습니다!';
     } else if (todayApplied && futureDaysApplied == 0) {
-      message = '✅ 오늘에만 새로운 템플릿이 적용되었습니다!';
+      message = '✅ 오늘에만 새로운 습관 템플릿이 적용되었습니다!';
     } else {
       message = '템플릿 적용에 문제가 발생했습니다.';
     }
@@ -167,14 +167,14 @@ class _TemplateScreenState extends State<TemplateScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text(
-          '할 일 수정',
+          '습관 수정',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         content: TextField(
           controller: controller,
           decoration: const InputDecoration(
-            hintText: '할 일을 입력하세요',
+            hintText: '습관을 입력하세요',
           ),
           autofocus: true,
         ),
@@ -243,7 +243,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      'Todo 템플릿',
+                      '반복 습관 템플릿',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -252,7 +252,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '매일 반복할 할 일들을 설정하세요',
+                      '매일 반복할 습관들을 설정하세요',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -285,7 +285,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           child: TextField(
                             controller: _textController,
                             decoration: const InputDecoration(
-                              hintText: '새로운 TODO 추가',
+                              hintText: '새로운 습관 추가',
                               prefixIcon: Icon(Icons.add_task_rounded),
                             ),
                             onSubmitted: (_) => _addTodoItem(),
@@ -360,7 +360,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                '템플릿에 할 일을 추가해보세요!',
+                                '템플릿에 습관을 추가해보세요!',
                                 style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey.shade600,
@@ -497,7 +497,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _applyTemplateFromToday,
                   icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('오늘부터 템플릿 적용하기'),
+                  label: const Text('오늘부터 습관 템플릿 적용하기'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.white.withOpacity(0.9),

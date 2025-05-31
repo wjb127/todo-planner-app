@@ -145,7 +145,7 @@ class _DailyScreenState extends State<DailyScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      '일일 체크',
+                      '일일 습관 체크',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -154,7 +154,7 @@ class _DailyScreenState extends State<DailyScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '오늘의 할 일을 확인하고 체크하세요',
+                      '오늘의 습관을 확인하고 체크하세요',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
