@@ -46,9 +46,9 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	
-	<!-- 애드몹 앱 ID (테스트용) -->
+	<!-- 애드몹 앱 ID -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-2803803669720807~5918793042</string>
 	
 	<!-- 앱 추적 투명성 -->
 	<key>NSUserTrackingUsageDescription</key>

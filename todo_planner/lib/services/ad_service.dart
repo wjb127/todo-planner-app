@@ -5,21 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AdService {
   static const String _adRemovedKey = 'ad_removed';
   
-  // 테스트 광고 ID (실제 배포시에는 실제 광고 ID로 변경해야 함)
+  // 실제 광고 ID
   static String get interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712'; // 테스트 ID
+      return 'ca-app-pub-2803803669720807/1723563018'; // 실제 전면광고 ID
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910'; // 테스트 ID
+      return 'ca-app-pub-2803803669720807/1723563018'; // iOS용 전면광고 ID (동일하게 사용)
     }
     throw UnsupportedError('Unsupported platform');
   }
   
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/6300978111'; // 테스트 ID
+      return 'ca-app-pub-2803803669720807/6300978111'; // 배너광고 ID (필요시 별도 생성)
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/2934735716'; // 테스트 ID
+      return 'ca-app-pub-2803803669720807/2934735716'; // iOS 배너광고 ID (필요시 별도 생성)
     }
     throw UnsupportedError('Unsupported platform');
   }
@@ -67,8 +67,8 @@ class AdService {
 
   // 전면 광고 표시
   static Future<void> showInterstitialAd() async {
-    final isAdRemoved = await isAdRemoved();
-    if (isAdRemoved) return;
+    final adRemoved = await isAdRemoved();
+    if (adRemoved) return;
     
     if (_isInterstitialAdReady && _interstitialAd != null) {
       await _interstitialAd!.show();
