@@ -12,14 +12,24 @@ class StatisticsScreen extends StatefulWidget {
   State<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
-class _StatisticsScreenState extends State<StatisticsScreen> {
+class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepAliveClientMixin {
   List<TodoItem> _template = [];
   Map<String, Map<String, bool>> _statisticsData = {};
   bool _isLoading = true;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   void initState() {
     super.initState();
+    _loadStatistics();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 페이지가 다시 보여질 때마다 데이터 새로고침
     _loadStatistics();
   }
 
@@ -147,6 +157,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // AutomaticKeepAliveClientMixin 필수
     if (_isLoading) {
       return Scaffold(
         body: Container(
@@ -695,7 +706,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       
                       const SizedBox(height: 20),
                       
-                      // Ad Removal Purchase Section
+                      // Ad Removal Purchase Section (주석처리)
+                      /*
                       FutureBuilder<bool>(
                         future: AdService.isAdRemoved(),
                         builder: (context, snapshot) {
@@ -878,6 +890,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                       ),
                       
                       const SizedBox(height: 20),
+                      */
                     ],
                   ),
                 ),

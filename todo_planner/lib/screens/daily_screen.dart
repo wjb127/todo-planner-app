@@ -9,16 +9,26 @@ class DailyScreen extends StatefulWidget {
   State<DailyScreen> createState() => _DailyScreenState();
 }
 
-class _DailyScreenState extends State<DailyScreen> {
+class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClientMixin {
   DateTime _selectedDate = DateTime.now();
   List<TodoItem> _dailyTodos = [];
   bool _isLoading = true;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
     _loadDailyData();
     StorageService.cleanOldData(); // 앱 시작시 오래된 데이터 정리
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 페이지가 다시 보여질 때마다 데이터 새로고침
+    _loadDailyData();
   }
 
   String _formatDate(DateTime date) {
@@ -124,6 +134,7 @@ class _DailyScreenState extends State<DailyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
