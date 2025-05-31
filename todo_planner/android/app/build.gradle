@@ -32,6 +32,13 @@ if (flutterVersionName == null) {
 def admobAppId = localProperties.getProperty('admob.app.id') ?: 'ca-app-pub-2803803669720807~5918793042'
 def admobInterstitialId = localProperties.getProperty('admob.interstitial.id') ?: 'ca-app-pub-2803803669720807/1723563018'
 
+// 키스토어 설정 로드
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace "com.example.habit_maker"
     compileSdk flutter.compileSdkVersion
@@ -51,6 +58,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     defaultConfig {
         applicationId "com.example.habit_maker"
         minSdkVersion flutter.minSdkVersion
@@ -58,16 +69,29 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         
+        buildConfigField "String", "ADMOB_APP_ID", "\"${localProperties.getProperty('admob.app.id', 'ca-app-pub-3940256099942544~3347511713')}\""
+        buildConfigField "String", "ADMOB_INTERSTITIAL_ID", "\"${localProperties.getProperty('admob.interstitial.id', 'ca-app-pub-3940256099942544/1033173712')}\""
+        
         manifestPlaceholders = [
-            admobAppId: admobAppId
+            admobAppId: localProperties.getProperty('admob.app.id', 'ca-app-pub-3940256099942544~3347511713')
         ]
+    }
+
+    // 서명 설정
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
@@ -78,4 +102,5 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    implementation 'com.google.android.gms:play-services-ads:22.6.0'
 }
