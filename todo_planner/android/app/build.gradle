@@ -40,7 +40,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "com.example.habit_maker"
+    namespace "com.habitmaker.app"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -63,7 +63,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.habit_maker"
+        applicationId "com.habitmaker.app"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()

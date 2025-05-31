@@ -2,9 +2,10 @@
 
 ## 앱 정보
 - **앱 이름**: 습관메이커 (Habit Maker)
-- **패키지명**: com.example.habit_maker
+- **패키지명**: com.habitmaker.app
 - **버전**: 1.0.0+1
-- **빌드 파일**: `todo_planner/build/app/outputs/flutter-apk/app-release.apk`
+- **AAB 파일**: `todo_planner/build/app/outputs/bundle/release/app-release.aab` (30.0MB)
+- **APK 파일**: `todo_planner/build/app/outputs/flutter-apk/app-release.apk` (30.3MB)
 
 ## 키스토어 정보
 - **키스토어 파일**: `todo_planner/android/habit-maker-key.jks`
@@ -24,23 +25,28 @@
 5. **애드몹 광고**: 앱 시작시 전면광고
 
 ## 구글 플레이 콘솔 업로드 준비
-1. APK 파일: `build/app/outputs/flutter-apk/app-release.apk` (30.3MB)
-2. 앱 아이콘: 기본 Flutter 아이콘 사용
-3. 스크린샷: 필요시 에뮬레이터에서 촬영
-4. 앱 설명: "습관 관리를 위한 스마트한 앱 - 반복 습관 템플릿과 일일 체크로 꾸준한 성장을 도와드립니다."
+1. **AAB 파일**: `build/app/outputs/bundle/release/app-release.aab` (30.0MB) ⭐ **메인 업로드 파일**
+2. APK 파일: `build/app/outputs/flutter-apk/app-release.apk` (30.3MB) (테스트용)
+3. 앱 아이콘: 기본 Flutter 아이콘 사용
+4. 스크린샷: 필요시 에뮬레이터에서 촬영
+5. 앱 설명: "습관 관리를 위한 스마트한 앱 - 반복 습관 템플릿과 일일 체크로 꾸준한 성장을 도와드립니다."
 
 ## 출시 체크리스트
+- [x] AAB 빌드 완료 ⭐
 - [x] APK 빌드 완료
+- [x] 패키지명 수정 (com.habitmaker.app)
 - [x] 키스토어 생성 및 설정
 - [x] 애드몹 연동
 - [x] 알림 기능 구현
 - [x] GitHub 업로드 완료
 - [ ] 구글 플레이 콘솔 계정 생성
-- [ ] 앱 등록 및 APK 업로드
+- [ ] 앱 등록 및 AAB 업로드
 - [ ] 스토어 리스팅 작성
 - [ ] 심사 제출
 
 ## 주의사항
+- **AAB 파일 사용**: 구글 플레이 스토어는 AAB 파일 필수
 - 현재 디버그 서명으로 빌드됨 (빠른 출시용)
 - 실제 배포시 프로덕션 키스토어 사용 권장
-- 애드몹 ID는 실제 계정 ID 사용중 
+- 애드몹 ID는 실제 계정 ID 사용중
+- 패키지명: com.habitmaker.app (고유 도메인) 

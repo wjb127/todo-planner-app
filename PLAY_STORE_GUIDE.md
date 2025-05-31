@@ -59,13 +59,15 @@
 - **기능 그래픽**: 1024x500 PNG
 - **스크린샷**: 최소 2개 (핸드폰용)
 
-## 5. APK 업로드
+## 5. AAB 업로드 (중요!)
 1. "앱 번들 탐색기" → "프로덕션" 선택
 2. "새 버전 만들기" 클릭
-3. APK 파일 업로드: `build/app/outputs/flutter-apk/app-release.apk`
+3. **AAB 파일 업로드**: `build/app/outputs/bundle/release/app-release.aab` ⭐
 4. 버전 정보 입력:
    - **버전 이름**: 1.0.0
    - **출시 노트**: "습관메이커 첫 출시! 반복 습관 관리의 새로운 시작"
+
+⚠️ **중요**: 구글 플레이 스토어는 2021년부터 AAB(Android App Bundle) 파일만 허용합니다. APK는 업로드할 수 없습니다!
 
 ## 6. 심사 제출
 1. 모든 필수 항목 완료 확인
@@ -78,7 +80,8 @@
 - 업데이트 계획 수립
 
 ## 필요한 파일들
-- ✅ APK: `build/app/outputs/flutter-apk/app-release.apk`
+- ✅ **AAB**: `build/app/outputs/bundle/release/app-release.aab` ⭐ **메인 업로드 파일**
+- ✅ APK: `build/app/outputs/flutter-apk/app-release.apk` (테스트용만)
 - ⚠️ 앱 아이콘: 512x512 PNG (추후 제작 필요)
 - ⚠️ 기능 그래픽: 1024x500 PNG (추후 제작 필요)
 - ⚠️ 스크린샷: 최소 2개 (추후 촬영 필요)
