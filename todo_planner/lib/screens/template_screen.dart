@@ -86,30 +86,36 @@ class _TemplateScreenState extends State<TemplateScreen> {
     }
 
     final today = DateTime.now();
+    final tomorrow = today.add(const Duration(days: 1));
     final dateString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
     
-    // 오늘부터 1개월 후까지의 날짜들에 템플릿 적용
-    final oneMonthLater = today.add(const Duration(days: 30));
-    int appliedDays = 0;
-    int skippedDays = 0;
+    bool todayApplied = false;
+    bool todaySkipped = false;
     
-    for (DateTime date = today; 
+    // 오늘 날짜 처리 - 진행 중이면 건너뛰기
+    final todayTodos = await StorageService.loadDailyData(dateString);
+    if (todayTodos.isNotEmpty && todayTodos.any((todo) => todo.isCompleted)) {
+      todaySkipped = true;
+    } else {
+      // 오늘에 새 템플릿 적용
+      final newTodos = _templateItems.map((templateItem) => TodoItem(
+        id: '${templateItem.id}_$dateString',
+        title: templateItem.title,
+        isCompleted: false,
+      )).toList();
+      await StorageService.saveDailyData(dateString, newTodos);
+      todayApplied = true;
+    }
+    
+    // 내일부터 1개월 후까지 무조건 새 템플릿으로 적용
+    final oneMonthLater = today.add(const Duration(days: 30));
+    int futureDaysApplied = 0;
+    
+    for (DateTime date = tomorrow; 
          date.isBefore(oneMonthLater.add(const Duration(days: 1))); 
          date = date.add(const Duration(days: 1))) {
       
       final targetDateString = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-      
-      // 해당 날짜의 기존 데이터 확인
-      final existingTodos = await StorageService.loadDailyData(targetDateString);
-      
-      // 기존 데이터가 있고 체크된 항목이 있으면 스킵
-      if (existingTodos.isNotEmpty) {
-        final hasCheckedItems = existingTodos.any((todo) => todo.isCompleted);
-        if (hasCheckedItems) {
-          skippedDays++;
-          continue;
-        }
-      }
       
       // 템플릿을 기반으로 새로운 Todo 리스트 생성 (모든 항목 미완료 상태)
       final newTodos = _templateItems.map((templateItem) => TodoItem(
@@ -118,19 +124,27 @@ class _TemplateScreenState extends State<TemplateScreen> {
         isCompleted: false,
       )).toList();
       
-      // 해당 날짜에 새로운 템플릿 저장
+      // 해당 날짜에 새로운 템플릿 저장 (기존 데이터 덮어쓰기)
       await StorageService.saveDailyData(targetDateString, newTodos);
-      appliedDays++;
+      futureDaysApplied++;
     }
     
     // 템플릿 적용 날짜 저장
     await StorageService.saveTemplateAppliedDate(dateString);
     
-    if (appliedDays > 0) {
-      _showSnackBar('✅ ${appliedDays}일에 새로운 템플릿이 적용되었습니다! ${skippedDays > 0 ? '($skippedDays일은 이미 진행 중이어서 건너뜀)' : ''}');
+    // 결과 메시지
+    String message = '';
+    if (todayApplied && futureDaysApplied > 0) {
+      message = '✅ 오늘부터 ${futureDaysApplied + 1}일간 새로운 템플릿이 적용되었습니다!';
+    } else if (todaySkipped && futureDaysApplied > 0) {
+      message = '✅ 오늘은 건너뛰고 내일부터 ${futureDaysApplied}일간 새로운 템플릿이 적용되었습니다!';
+    } else if (todayApplied && futureDaysApplied == 0) {
+      message = '✅ 오늘에만 새로운 템플릿이 적용되었습니다!';
     } else {
-      _showSnackBar('모든 날짜가 이미 진행 중이어서 템플릿을 적용하지 않았습니다.', isError: true);
+      message = '템플릿 적용에 문제가 발생했습니다.';
     }
+    
+    _showSnackBar(message);
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
