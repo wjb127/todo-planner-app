@@ -3,8 +3,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/template_screen.dart';
 import 'screens/daily_screen.dart';
 import 'screens/statistics_screen.dart';
+import 'services/ad_service.dart';
+import 'services/purchase_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 애드몹과 인앱결제 초기화
+  await AdService.initialize();
+  await PurchaseService.initialize();
+  
   runApp(const TodoPlannerApp());
 }
 
@@ -77,6 +85,7 @@ class TodoPlannerApp extends StatelessWidget {
         ),
       ),
       home: const MainScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -88,8 +97,9 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
+  int _currentIndex = 0;
+  bool _hasShownInitialAd = false;
 
   final List<Widget> _screens = [
     const TemplateScreen(),
@@ -98,9 +108,53 @@ class _MainScreenState extends State<MainScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    
+    // 앱 시작 후 잠시 후 광고 표시
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showInitialAd();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    AdService.dispose();
+    PurchaseService.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // 앱이 포그라운드로 돌아올 때 광고 표시 (첫 실행 제외)
+    if (state == AppLifecycleState.resumed && _hasShownInitialAd) {
+      _showInterstitialAd();
+    }
+  }
+
+  Future<void> _showInitialAd() async {
+    if (!_hasShownInitialAd) {
+      await Future.delayed(const Duration(seconds: 1)); // 1초 후 광고 표시
+      await AdService.showInterstitialAd();
+      _hasShownInitialAd = true;
+    }
+  }
+
+  Future<void> _showInterstitialAd() async {
+    await AdService.showInterstitialAd();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [
@@ -112,23 +166,38 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
         child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
+          currentIndex: _currentIndex,
           onTap: (index) {
             setState(() {
-              _selectedIndex = index;
+              _currentIndex = index;
             });
           },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Colors.grey.shade600,
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 12,
+          ),
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.edit_note_rounded),
+              icon: Icon(Icons.assignment_outlined),
+              activeIcon: Icon(Icons.assignment),
               label: '템플릿',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.today_rounded),
+              icon: Icon(Icons.today_outlined),
+              activeIcon: Icon(Icons.today),
               label: '일일 체크',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_rounded),
+              icon: Icon(Icons.analytics_outlined),
+              activeIcon: Icon(Icons.analytics),
               label: '통계',
             ),
           ],
