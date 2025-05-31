@@ -231,7 +231,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           child: TextField(
                             controller: _textController,
                             decoration: const InputDecoration(
-                              hintText: '새로운 할 일을 입력하세요',
+                              hintText: '새로운 TODO 추가',
                               prefixIcon: Icon(Icons.add_task_rounded),
                             ),
                             onSubmitted: (_) => _addTodoItem(),
@@ -247,12 +247,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(
-                          Icons.info_outline_rounded,
-                          size: 16,
-                          color: Colors.grey.shade600,
-                        ),
-                        const SizedBox(width: 8),
                         Text(
                           '${_templateItems.length}/30개',
                           style: TextStyle(
@@ -291,10 +285,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -334,7 +325,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           ),
                         )
                       : ReorderableListView.builder(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                           itemCount: _templateItems.length,
                           onReorder: _reorderItems,
                           proxyDecorator: (child, index, animation) {
@@ -348,7 +339,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                   scale: scale,
                                   child: Material(
                                     elevation: elevation,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                     child: child,
                                   ),
                                 );
@@ -360,22 +351,22 @@ class _TemplateScreenState extends State<TemplateScreen> {
                             final item = _templateItems[index];
                             return Container(
                               key: ValueKey(item.id),
-                              margin: const EdgeInsets.only(bottom: 6),
+                              margin: const EdgeInsets.only(bottom: 4),
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade50,
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
                                   color: Colors.grey.shade200,
                                   width: 1,
                                 ),
                               ),
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(12),
                                 onTap: () => _showEditDialog(index),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
-                                    vertical: 8,
+                                    vertical: 2,
                                   ),
                                   child: Row(
                                     children: [
@@ -447,11 +438,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  ),
+                  color: Colors.transparent,
                 ),
                 child: ElevatedButton.icon(
                   onPressed: _applyTemplateFromToday,
@@ -459,11 +446,12 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   label: const Text('오늘부터 템플릿 적용하기'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white.withOpacity(0.9),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: 0,
                   ),
                 ),
               ),
