@@ -362,12 +362,12 @@ class _DailyScreenState extends State<DailyScreen> {
                               itemBuilder: (context, index) {
                                 final todo = _dailyTodos[index];
                                 return Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
+                                  margin: const EdgeInsets.only(bottom: 4),
                                   decoration: BoxDecoration(
                                     color: todo.isCompleted 
                                         ? Colors.green.shade50 
                                         : Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: todo.isCompleted 
                                           ? Colors.green.shade200 
@@ -377,9 +377,10 @@ class _DailyScreenState extends State<DailyScreen> {
                                   ),
                                   child: CheckboxListTile(
                                     contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20,
-                                      vertical: 8,
+                                      horizontal: 16,
+                                      vertical: 0,
                                     ),
+                                    visualDensity: VisualDensity.compact,
                                     value: todo.isCompleted,
                                     onChanged: (_) => _toggleTodoCompletion(index),
                                     controlAffinity: ListTileControlAffinity.leading,
@@ -388,7 +389,7 @@ class _DailyScreenState extends State<DailyScreen> {
                                     title: Text(
                                       todo.title,
                                       style: TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         decoration: todo.isCompleted
                                             ? TextDecoration.lineThrough
@@ -400,15 +401,15 @@ class _DailyScreenState extends State<DailyScreen> {
                                     ),
                                     secondary: todo.isCompleted
                                         ? Container(
-                                            padding: const EdgeInsets.all(8),
+                                            padding: const EdgeInsets.all(6),
                                             decoration: BoxDecoration(
                                               color: Colors.green.shade100,
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius: BorderRadius.circular(8),
                                             ),
                                             child: Icon(
                                               Icons.check_rounded,
                                               color: Colors.green.shade600,
-                                              size: 16,
+                                              size: 14,
                                             ),
                                           )
                                         : null,

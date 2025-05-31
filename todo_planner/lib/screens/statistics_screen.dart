@@ -33,20 +33,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     // 현재 템플릿 로드
     final template = await StorageService.loadTemplate();
     
-    // 템플릿 적용 날짜 확인
-    final templateAppliedDate = await StorageService.getTemplateAppliedDate();
-    
-    // 통계 기간 설정 (템플릿 적용일 또는 6개월 전 중 더 늦은 날짜부터)
+    // 최근 30일간의 통계 기간 설정 (29일 전부터 오늘까지)
     final now = DateTime.now();
-    final sixMonthsAgo = now.subtract(const Duration(days: 180));
-    DateTime startDate = sixMonthsAgo;
-    
-    if (templateAppliedDate != null) {
-      final appliedDate = DateTime.parse(templateAppliedDate);
-      if (appliedDate.isAfter(sixMonthsAgo)) {
-        startDate = appliedDate;
-      }
-    }
+    final thirtyDaysAgo = now.subtract(const Duration(days: 29));
+    DateTime startDate = thirtyDaysAgo;
 
     // 통계 데이터 수집
     final statisticsData = <String, Map<String, bool>>{};
@@ -127,6 +117,30 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     if (rate >= 0.6) return Colors.blue;
     if (rate >= 0.4) return Colors.orange;
     return Colors.red;
+  }
+
+  String _getTitle(double averageRate) {
+    if (averageRate >= 0.95) return "완벽주의자";
+    if (averageRate >= 0.90) return "철인";
+    if (averageRate >= 0.85) return "성실한 자";
+    if (averageRate >= 0.80) return "근면한 자";
+    if (averageRate >= 0.75) return "부지런한 자";
+    if (averageRate >= 0.70) return "꾸준한 자";
+    if (averageRate >= 0.65) return "노력하는 자";
+    if (averageRate >= 0.60) return "시도하는 자";
+    if (averageRate >= 0.50) return "게으른 자";
+    if (averageRate >= 0.30) return "나태한 자";
+    if (averageRate >= 0.10) return "무기력한 자";
+    return "잠자는 자";
+  }
+
+  Color _getTitleColor(double averageRate) {
+    if (averageRate >= 0.90) return Colors.purple.shade700;
+    if (averageRate >= 0.80) return Colors.blue.shade700;
+    if (averageRate >= 0.70) return Colors.green.shade700;
+    if (averageRate >= 0.60) return Colors.orange.shade700;
+    if (averageRate >= 0.50) return Colors.red.shade600;
+    return Colors.grey.shade600;
   }
 
   @override
@@ -585,7 +599,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
-                            _buildSummaryRow('분석 기간', '${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "없음"} ~ ${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) > 0 ? a : b) : "없음"}'),
+                            _buildSummaryRow('분석 기간', '최근 30일 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "없음"} ~ ${_formatDate(DateTime.now())})'),
                             _buildSummaryRow('총 분석 일수', '${_statisticsData.length}일'),
                             _buildSummaryRow('템플릿 항목 수', '${_template.length}개'),
                             if (completionRates.isNotEmpty) ...[
@@ -593,6 +607,51 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                               _buildSummaryRow('평균 완료율', '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'),
                               _buildSummaryRow('최고 완료율', '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'),
                               _buildSummaryRow('최저 완료율', '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'),
+                              const SizedBox(height: 12),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.1),
+                                      _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.05),
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.military_tech_rounded,
+                                      color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length),
+                                      size: 32,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      '칭호',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '"${_getTitle(completionRates.values.reduce((a, b) => a + b) / completionRates.length)}"',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ],
                         ),
