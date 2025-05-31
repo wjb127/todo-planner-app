@@ -63,6 +63,16 @@ class _DailyScreenState extends State<DailyScreen> {
       initialDate: _selectedDate,
       firstDate: sixMonthsAgo,
       lastDate: oneMonthLater,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -79,14 +89,20 @@ class _DailyScreenState extends State<DailyScreen> {
     final selected = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     
     if (selected == today) {
-      return '오늘 (${_formatDate(_selectedDate)})';
+      return '오늘';
     } else if (selected == today.subtract(const Duration(days: 1))) {
-      return '어제 (${_formatDate(_selectedDate)})';
+      return '어제';
     } else if (selected == today.add(const Duration(days: 1))) {
-      return '내일 (${_formatDate(_selectedDate)})';
+      return '내일';
     } else {
-      return _formatDate(_selectedDate);
+      final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+      final weekday = weekdays[_selectedDate.weekday - 1];
+      return '${_selectedDate.month}월 ${_selectedDate.day}일 ($weekday)';
     }
+  }
+
+  String _getFullDateText() {
+    return _formatDate(_selectedDate);
   }
 
   int _getCompletedCount() {
@@ -98,117 +114,315 @@ class _DailyScreenState extends State<DailyScreen> {
     return _getCompletedCount() / _dailyTodos.length;
   }
 
+  Color _getProgressColor() {
+    final rate = _getCompletionRate();
+    if (rate == 1.0) return Colors.green;
+    if (rate >= 0.7) return Colors.blue;
+    if (rate >= 0.4) return Colors.orange;
+    return Colors.red;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('일일 체크'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Column(
-        children: [
-          // 날짜 선택 영역
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                InkWell(
-                  onTap: _selectDate,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _getDateDisplayText(),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const Icon(Icons.calendar_today),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // 진행률 표시
-                if (_dailyTodos.isNotEmpty) ...[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '완료: ${_getCompletedCount()}/${_dailyTodos.length}',
-                        style: const TextStyle(fontSize: 14),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withOpacity(0.8),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      '일일 체크',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      Text(
-                        '${(_getCompletionRate() * 100).toStringAsFixed(1)}%',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '오늘의 할 일을 확인하고 체크하세요',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Date Selection & Progress
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    // Date Selector
+                    InkWell(
+                      onTap: _selectDate,
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
                         ),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.calendar_today_rounded,
+                                color: Theme.of(context).colorScheme.primary,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _getDateDisplayText(),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    _getFullDateText(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.grey.shade400,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    
+                    // Progress Section
+                    if (_dailyTodos.isNotEmpty) ...[
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '완료: ${_getCompletedCount()}/${_dailyTodos.length}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getProgressColor().withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '${(_getCompletionRate() * 100).toStringAsFixed(0)}%',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: _getProgressColor(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: LinearProgressIndicator(
+                                    value: _getCompletionRate(),
+                                    backgroundColor: Colors.grey.shade200,
+                                    valueColor: AlwaysStoppedAnimation<Color>(_getProgressColor()),
+                                    minHeight: 8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Todo List
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, -2),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: _getCompletionRate(),
-                    backgroundColor: Colors.grey[300],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      _getCompletionRate() == 1.0 ? Colors.green : Colors.blue,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          const Divider(),
-          // Todo 리스트
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _dailyTodos.isEmpty
-                    ? const Center(
-                        child: Text(
-                          '이 날짜에는 할 일이 없습니다.\n템플릿을 먼저 설정해주세요.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _dailyTodos.length,
-                        itemBuilder: (context, index) {
-                          final todo = _dailyTodos[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            child: CheckboxListTile(
-                              title: Text(
-                                todo.title,
-                                style: TextStyle(
-                                  decoration: todo.isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : null,
-                                  color: todo.isCompleted
-                                      ? Colors.grey
-                                      : null,
-                                ),
+                  child: _isLoading
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : _dailyTodos.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.assignment_outlined,
+                                    size: 64,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    '이 날짜에는 할 일이 없습니다',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '템플릿을 먼저 설정해주세요',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              value: todo.isCompleted,
-                              onChanged: (_) => _toggleTodoCompletion(index),
-                              controlAffinity: ListTileControlAffinity.leading,
+                            )
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: _dailyTodos.length,
+                              itemBuilder: (context, index) {
+                                final todo = _dailyTodos[index];
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  decoration: BoxDecoration(
+                                    color: todo.isCompleted 
+                                        ? Colors.green.shade50 
+                                        : Colors.grey.shade50,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: todo.isCompleted 
+                                          ? Colors.green.shade200 
+                                          : Colors.grey.shade200,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: CheckboxListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 8,
+                                    ),
+                                    value: todo.isCompleted,
+                                    onChanged: (_) => _toggleTodoCompletion(index),
+                                    controlAffinity: ListTileControlAffinity.leading,
+                                    activeColor: Colors.green.shade600,
+                                    checkColor: Colors.white,
+                                    title: Text(
+                                      todo.title,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        decoration: todo.isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                        color: todo.isCompleted
+                                            ? Colors.grey.shade600
+                                            : Colors.black87,
+                                      ),
+                                    ),
+                                    secondary: todo.isCompleted
+                                        ? Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green.shade100,
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            child: Icon(
+                                              Icons.check_rounded,
+                                              color: Colors.green.shade600,
+                                              size: 16,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
