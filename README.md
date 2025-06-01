@@ -59,7 +59,7 @@
 
 ## 📞 문의
 
-- **이메일**: habitmaker.support@gmail.com
+- **이메일**: wjb127@naver.com
 - **GitHub**: [habit-maker](https://github.com/seungbeenwi/habit-maker)
 
 ## 📸 스크린샷

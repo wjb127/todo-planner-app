@@ -95,7 +95,7 @@
 
 이용약관과 관련한 문의사항이 있으시면 아래로 연락해 주세요:
 
-**이메일**: habitmaker.support@gmail.com
+**이메일**: wjb127@naver.com
 **개발자**: Habit Maker Team
 
 ---
@@ -162,7 +162,7 @@ Habit Maker is a mobile application that helps users manage and track their dail
 ### 9. Contact
 
 For terms-related inquiries:
-**Email**: habitmaker.support@gmail.com
+**Email**: wjb127@naver.com
 
 ---
 
@@ -228,4 +228,4 @@ For terms-related inquiries:
 ### 9. お問い合わせ
 
 利用規約に関するお問い合わせ:
-**メール**: habitmaker.support@gmail.com 
+**メール**: wjb127@naver.com 

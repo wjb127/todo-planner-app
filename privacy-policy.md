@@ -76,7 +76,7 @@
 
 개인정보 처리와 관련한 문의사항이 있으시면 아래로 연락해 주세요:
 
-**이메일**: habitmaker.support@gmail.com
+**이메일**: wjb127@naver.com
 **개발자**: Habit Maker Team
 
 ---
@@ -126,7 +126,7 @@ Last Updated: June 1, 2025
 ### 7. Contact Us
 
 For privacy-related inquiries:
-**Email**: habitmaker.support@gmail.com
+**Email**: wjb127@naver.com
 
 ---
 
@@ -175,4 +175,4 @@ For privacy-related inquiries:
 ### 7. お問い合わせ
 
 プライバシーに関するお問い合わせ:
-**メール**: habitmaker.support@gmail.com 
+**メール**: wjb127@naver.com
