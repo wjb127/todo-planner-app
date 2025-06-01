@@ -2,7 +2,7 @@
 
 **습관메이커 (Habit Maker)**
 
-최종 업데이트: 2024년 12월 19일
+최종 업데이트: 2025년 6월 1일
 
 ## 1. 개인정보 수집 및 이용
 
@@ -85,7 +85,7 @@
 
 **Habit Maker**
 
-Last Updated: December 19, 2024
+Last Updated: June 1, 2025
 
 ### 1. Information We Collect
 
@@ -134,7 +134,7 @@ For privacy-related inquiries:
 
 **ハビットメーカー**
 
-最終更新: 2024年12月19日
+最終更新: 2025年6月1日
 
 ### 1. 収集する情報
 

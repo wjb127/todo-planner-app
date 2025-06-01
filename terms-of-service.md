@@ -2,7 +2,7 @@
 
 **습관메이커 (Habit Maker)**
 
-최종 업데이트: 2024년 12월 19일
+최종 업데이트: 2025년 6월 1일
 
 ## 1. 서비스 소개
 
@@ -104,7 +104,7 @@
 
 **Habit Maker**
 
-Last Updated: December 19, 2024
+Last Updated: June 1, 2025
 
 ### 1. Service Description
 
@@ -170,7 +170,7 @@ For terms-related inquiries:
 
 **ハビットメーカー**
 
-最終更新: 2024年12月19日
+最終更新: 2025年6月1日
 
 ### 1. サービス説明
 
