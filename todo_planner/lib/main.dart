@@ -11,10 +11,16 @@ import 'services/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 애드몹, 인앱결제, 알림 초기화
-  await AdService.initialize();
-  await PurchaseService.initialize();
+  // 알림 서비스 초기화
   await NotificationService.initialize();
+  
+  // 알림이 활성화되어 있다면 다시 스케줄링
+  if (await NotificationService.isNotificationEnabled()) {
+    await NotificationService.scheduleDailyNotification();
+  }
+  
+  // 애드몹 초기화
+  await AdService.initialize();
   
   runApp(const TodoPlannerApp());
 }

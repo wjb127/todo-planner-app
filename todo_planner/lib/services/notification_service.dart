@@ -58,20 +58,28 @@ class NotificationService {
 
   static Future<void> _requestPermissions() async {
     if (Platform.isAndroid) {
-      await Permission.notification.request();
+      // Android 13+ 알림 권한 요청
+      final status = await Permission.notification.request();
+      debugPrint('Notification permission status: $status');
       
-      // Android 13+ 알림 권한
-      if (await Permission.notification.isDenied) {
+      if (status.isDenied) {
+        debugPrint('Notification permission denied, requesting again...');
         await Permission.notification.request();
       }
+      
+      // 정확한 알람 권한도 요청 (Android 12+)
+      if (Platform.isAndroid) {
+        await Permission.scheduleExactAlarm.request();
+      }
     } else if (Platform.isIOS) {
-      await _notifications
+      final result = await _notifications
           .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
           ?.requestPermissions(
             alert: true,
             badge: true,
             sound: true,
           );
+      debugPrint('iOS notification permission result: $result');
     }
   }
 
@@ -81,15 +89,28 @@ class NotificationService {
   }
 
   static Future<void> scheduleDailyNotification() async {
+    // 권한 체크
+    if (Platform.isAndroid) {
+      final status = await Permission.notification.status;
+      if (!status.isGranted) {
+        debugPrint('Notification permission not granted, requesting...');
+        await _requestPermissions();
+      }
+    }
+    
     // 랜덤 메시지 선택
     final random = Random();
     final message = _motivationalMessages[random.nextInt(_motivationalMessages.length)];
+    
+    final scheduledTime = _nextInstanceOfEightAM();
+    debugPrint('Scheduling notification for: $scheduledTime');
+    debugPrint('Notification message: $message');
     
     await _notifications.zonedSchedule(
       0, // 알림 ID
       '습관메이커', // 제목
       message, // 내용
-      _nextInstanceOfEightAM(), // 다음 8시
+      scheduledTime, // 다음 8시
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_habit_reminder',
@@ -112,6 +133,7 @@ class NotificationService {
     
     // 설정 저장
     await setNotificationEnabled(true);
+    debugPrint('Daily notification scheduled successfully');
   }
 
   static tz.TZDateTime _nextInstanceOfEightAM() {
@@ -148,5 +170,33 @@ class NotificationService {
     } else {
       await scheduleDailyNotification();
     }
+  }
+
+  // 테스트용 즉시 알림
+  static Future<void> sendTestNotification() async {
+    final random = Random();
+    final message = _motivationalMessages[random.nextInt(_motivationalMessages.length)];
+    
+    await _notifications.show(
+      999, // 테스트용 ID
+      '습관메이커 (테스트)',
+      message,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'test_notification',
+          '테스트 알림',
+          channelDescription: '알림 테스트용',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      ),
+    );
+    debugPrint('Test notification sent: $message');
   }
 } 

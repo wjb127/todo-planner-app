@@ -213,6 +213,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  await NotificationService.sendTestNotification();
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text('테스트 알림을 보냈습니다!'),
+                                        backgroundColor: Colors.green.shade600,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        margin: const EdgeInsets.all(16),
+                                      ),
+                                    );
+                                  }
+                                },
+                                icon: const Icon(Icons.send_rounded),
+                                label: const Text('테스트 알림 보내기'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ],
                       ),
