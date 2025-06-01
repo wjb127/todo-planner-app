@@ -6,7 +6,7 @@ class AdService {
   static const String _adRemovedKey = 'ad_removed';
   static const String _testModeKey = 'test_mode';
   
-  // 테스트 모드 설정 (개발 중에는 true로 설정)
+  // 출시용: 테스트 모드 기본값을 false로 설정
   static bool _isTestMode = false;
   
   // 실제 광고 ID
@@ -36,13 +36,18 @@ class AdService {
     await MobileAds.instance.initialize();
     _isTestMode = await getTestMode();
     _loadInterstitialAd();
+    print('🔥 AdService initialized - Test mode: $_isTestMode');
   }
 
   // 전면 광고 로드
   static void _loadInterstitialAd() {
     // 테스트 모드에서는 광고 로드하지 않음
-    if (_isTestMode) return;
+    if (_isTestMode) {
+      print('🧪 테스트 모드: 광고 로드 건너뜀');
+      return;
+    }
     
+    print('📱 전면광고 로드 시작...');
     InterstitialAd.load(
       adUnitId: interstitialAdUnitId,
       request: const AdRequest(),
@@ -50,15 +55,18 @@ class AdService {
         onAdLoaded: (ad) {
           _interstitialAd = ad;
           _isInterstitialAdReady = true;
+          print('✅ 전면광고 로드 완료');
           
           _interstitialAd!.setImmersiveMode(true);
           _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
             onAdDismissedFullScreenContent: (ad) {
+              print('📱 광고 닫힘');
               ad.dispose();
               _isInterstitialAdReady = false;
               _loadInterstitialAd(); // 다음 광고 미리 로드
             },
             onAdFailedToShowFullScreenContent: (ad, error) {
+              print('❌ 광고 표시 실패: $error');
               ad.dispose();
               _isInterstitialAdReady = false;
               _loadInterstitialAd();
@@ -66,8 +74,12 @@ class AdService {
           );
         },
         onAdFailedToLoad: (error) {
-          print('InterstitialAd failed to load: $error');
+          print('❌ 전면광고 로드 실패: $error');
           _isInterstitialAdReady = false;
+          // 5초 후 재시도
+          Future.delayed(const Duration(seconds: 5), () {
+            _loadInterstitialAd();
+          });
         },
       ),
     );
@@ -75,6 +87,8 @@ class AdService {
 
   // 전면 광고 표시
   static Future<void> showInterstitialAd() async {
+    print('🎯 광고 표시 요청 - 테스트모드: $_isTestMode, 광고준비: $_isInterstitialAdReady');
+    
     // 테스트 모드에서는 광고 표시하지 않음
     if (_isTestMode) {
       print('🧪 테스트 모드: 광고 표시 건너뜀');
@@ -82,10 +96,18 @@ class AdService {
     }
     
     final adRemoved = await isAdRemoved();
-    if (adRemoved) return;
+    if (adRemoved) {
+      print('💰 광고 제거됨: 광고 표시 건너뜀');
+      return;
+    }
     
     if (_isInterstitialAdReady && _interstitialAd != null) {
+      print('🚀 전면광고 표시!');
       await _interstitialAd!.show();
+    } else {
+      print('⏳ 광고가 아직 준비되지 않음');
+      // 광고가 준비되지 않았다면 다시 로드 시도
+      _loadInterstitialAd();
     }
   }
 
@@ -101,10 +123,10 @@ class AdService {
     await prefs.setBool(_adRemovedKey, removed);
   }
 
-  // 테스트 모드 상태 확인
+  // 테스트 모드 상태 확인 (출시용: 기본값 false)
   static Future<bool> getTestMode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_testModeKey) ?? false;
+    return prefs.getBool(_testModeKey) ?? false; // 기본값 false
   }
 
   // 테스트 모드 설정
@@ -112,6 +134,8 @@ class AdService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_testModeKey, testMode);
     _isTestMode = testMode;
+    
+    print('🔧 테스트 모드 변경: $testMode');
     
     if (testMode) {
       // 테스트 모드 활성화 시 기존 광고 정리

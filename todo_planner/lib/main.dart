@@ -143,7 +143,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     
-    // 앱 시작 후 잠시 후 광고 표시
+    // 앱 시작 후 광고 표시
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInitialAd();
     });
@@ -164,13 +164,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   Future<void> _showInitialAd() async {
     if (!_hasShownInitialAd) {
-      await Future.delayed(const Duration(seconds: 1)); // 1초 후 광고 표시
+      print('🚀 앱 시작 - 초기 광고 표시 준비');
+      await Future.delayed(const Duration(seconds: 2)); // 2초 후 광고 표시
       await AdService.showInterstitialAd();
       _hasShownInitialAd = true;
     }
   }
 
   Future<void> _showInterstitialAd() async {
+    print('📊 통계 탭 이동 - 광고 표시');
     await AdService.showInterstitialAd();
   }
 
@@ -214,8 +216,8 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) async {
-            // 탭 변경 시 광고 표시 (너무 자주 나오지 않도록 조건 추가)
-            if (_currentIndex != index && index == 2) { // 통계 탭으로 이동할 때만
+            // 통계 탭으로 이동할 때 광고 표시
+            if (_currentIndex != index && index == 2) {
               await _showInterstitialAd();
             }
             setState(() {
