@@ -185,23 +185,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      // 현재 시간대 정보 표시
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.blue.shade50,
-                                          borderRadius: BorderRadius.circular(8),
-                                          border: Border.all(color: Colors.blue.shade200),
-                                        ),
-                                        child: Text(
-                                          NotificationService.getCurrentTimezoneInfo(),
-                                          style: TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.blue.shade700,
-                                            fontFamily: 'monospace',
-                                          ),
-                                        ),
-                                      ),
+                                      // 현재 시간대 정보 표시 (출시용에서 숨김)
+                                      // Container(
+                                      //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      //   decoration: BoxDecoration(
+                                      //     color: Colors.blue.shade50,
+                                      //     borderRadius: BorderRadius.circular(8),
+                                      //     border: Border.all(color: Colors.blue.shade200),
+                                      //   ),
+                                      //   child: Text(
+                                      //     NotificationService.getCurrentTimezoneInfo(),
+                                      //     style: TextStyle(
+                                      //       fontSize: 11,
+                                      //       color: Colors.blue.shade700,
+                                      //       fontFamily: 'monospace',
+                                      //     ),
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
                                 ),
@@ -243,38 +243,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  await NotificationService.sendTestNotification();
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text('테스트 알림을 보냈습니다!'),
-                                        backgroundColor: Colors.green.shade600,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        margin: const EdgeInsets.all(16),
-                                      ),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(Icons.send_rounded),
-                                label: const Text('즉시 테스트 알림'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // 즉시 테스트 알림 버튼 (출시용에서 숨김)
+                            // const SizedBox(height: 12),
+                            // SizedBox(
+                            //   width: double.infinity,
+                            //   child: ElevatedButton.icon(
+                            //     onPressed: () async {
+                            //       await NotificationService.sendTestNotification();
+                            //       if (mounted) {
+                            //         ScaffoldMessenger.of(context).showSnackBar(
+                            //           SnackBar(
+                            //             content: const Text('테스트 알림을 보냈습니다!'),
+                            //             backgroundColor: Colors.green.shade600,
+                            //             behavior: SnackBarBehavior.floating,
+                            //             shape: RoundedRectangleBorder(
+                            //               borderRadius: BorderRadius.circular(12),
+                            //             ),
+                            //             margin: const EdgeInsets.all(16),
+                            //           ),
+                            //         );
+                            //       }
+                            //     },
+                            //     icon: const Icon(Icons.send_rounded),
+                            //     label: const Text('즉시 테스트 알림'),
+                            //     style: ElevatedButton.styleFrom(
+                            //       backgroundColor: Theme.of(context).colorScheme.primary,
+                            //       foregroundColor: Colors.white,
+                            //       padding: const EdgeInsets.symmetric(vertical: 12),
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(12),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         ],
                       ),
@@ -438,34 +439,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           
                           const SizedBox(height: 12),
                           
-                          // 자동 백업 안내
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.blue.shade200),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
-                                  color: Colors.blue.shade600,
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    '매일 자동으로 백업이 생성됩니다. 앱 업데이트 시 데이터가 안전하게 보호됩니다.',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.blue.shade700,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // 샘플 데이터 생성 버튼 (테스트용) - 출시용에서 숨김
+                          // SizedBox(
+                          //   width: double.infinity,
+                          //   child: ElevatedButton.icon(
+                          //     onPressed: () async {
+                          //       final confirm = await _showConfirmDialog(
+                          //         '샘플 데이터 생성',
+                          //         '테스트용 샘플 데이터를 생성하시겠습니까?\n기존 데이터가 덮어씌워질 수 있습니다.',
+                          //       );
+                          //       if (confirm) {
+                          //         setState(() => _isLoading = true);
+                          //         try {
+                          //           await BackupService.createSampleData();
+                          //           await _loadSettings(); // 백업 정보 새로고침
+                          //           _showSnackBar('샘플 데이터가 생성되었습니다! 🎯\n8개의 습관과 7일간의 기록이 추가되었어요.');
+                          //         } catch (e) {
+                          //           _showSnackBar('샘플 데이터 생성 중 오류가 발생했습니다: $e', isError: true);
+                          //         } finally {
+                          //           setState(() => _isLoading = false);
+                          //         }
+                          //       }
+                          //     },
+                          //     icon: const Icon(Icons.auto_awesome_rounded),
+                          //     label: const Text('샘플 데이터 생성 (테스트용)'),
+                          //     style: ElevatedButton.styleFrom(
+                          //       backgroundColor: Colors.orange.shade600,
+                          //       foregroundColor: Colors.white,
+                          //       padding: const EdgeInsets.symmetric(vertical: 12),
+                          //       shape: RoundedRectangleBorder(
+                          //         borderRadius: BorderRadius.circular(12),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

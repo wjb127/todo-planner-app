@@ -1,0 +1,14 @@
+# 🔐 키스토어 설정 템플릿
+# 이 파일을 key.properties로 복사하고 실제 값으로 수정하세요
+# key.properties 파일은 .gitignore에 포함되어 GitHub에 업로드되지 않습니다
+
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=YOUR_KEY_ALIAS
+storeFile=YOUR_KEYSTORE_FILE_PATH
+
+# 예시:
+# storePassword=habitmaker2024
+# keyPassword=habitmaker2024
+# keyAlias=habit-maker
+# storeFile=habit-maker-key.jks 

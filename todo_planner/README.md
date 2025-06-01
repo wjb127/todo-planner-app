@@ -1,74 +1,119 @@
-# Todo Planner
+# 🎯 습관메이커 (Habit Maker)
 
-Flutter 기반의 일일 루틴 관리 앱입니다. SharedPreferences를 활용하여 로컬에 데이터를 저장하며, 템플릿 기반의 Todo 관리와 통계 기능을 제공합니다.
+매일 반복하는 습관을 만들고 관리하는 Flutter 앱입니다.
 
-## 주요 기능
+## ✨ 주요 기능
 
-### 1. 템플릿 관리 (첫 번째 탭)
-- 매일 반복할 Todo 템플릿을 생성하고 관리
-- 최대 30개의 Todo 항목 추가 가능
-- 템플릿 항목 추가, 수정, 삭제 기능
-- "오늘부터 현재 템플릿 반영" 버튼으로 새로운 템플릿 적용
+- 📝 **습관 템플릿**: 최대 30개의 일일 습관 설정
+- ✅ **일일 체크**: 간편한 체크리스트로 습관 관리
+- 📊 **통계 및 분석**: 완료율과 성취 칭호 시스템
+- 🔔 **스마트 알림**: 하루 3회 자동 알림 (8시, 13시, 18시)
+- 💾 **자동 백업**: 안전한 데이터 보호
+- 🌍 **다국어 지원**: 한국어, 영어, 일본어
 
-### 2. 일일 체크 (두 번째 탭)
-- 날짜 선택기를 통한 특정 날짜의 Todo 확인
-- 기본값은 오늘 날짜
-- 템플릿 기반의 체크리스트 형태로 할 일 관리
-- 실시간 완료율 표시 (진행률 바 포함)
-- 과거 6개월 ~ 미래 1개월 범위의 데이터 조회 가능
-- 체크박스를 통한 간편한 완료 상태 토글
+## 🚀 시작하기
 
-### 3. 통계 (세 번째 탭)
-- 현재 템플릿 기준 항목별 완료율 통계
-- 최근 6개월 또는 템플릿 적용 시점부터의 데이터 분석
-- 일별 완료율 추이 그래프 (fl_chart 라이브러리 사용)
-- 항목별 완료율 표 (색상으로 성과 구분)
-- 통계 요약 정보 (분석 기간, 평균/최고/최저 완료율 등)
+### 필수 요구사항
 
-## 기술 스택
+- Flutter SDK 3.0+
+- Dart 3.0+
+- Android Studio / VS Code
+- Android SDK (API 21+)
 
-- **Flutter**: 크로스 플랫폼 모바일 앱 개발
-- **SharedPreferences**: 로컬 데이터 저장
-- **fl_chart**: 통계 차트 표시
+### 설치 및 실행
 
-## 데이터 관리
+1. **저장소 클론**
+```bash
+git clone https://github.com/YOUR_USERNAME/todo-planner-app.git
+cd todo-planner-app/todo_planner
+```
 
-### 자동 데이터 정리
-- 6개월 이전의 오래된 데이터는 자동으로 삭제
-- 앱 시작 시 자동으로 정리 작업 수행
+2. **의존성 설치**
+```bash
+flutter pub get
+```
 
-### 데이터 구조
-- 템플릿 데이터: JSON 형태로 SharedPreferences에 저장
-- 일일 데이터: 날짜별로 개별 키에 저장
-- 템플릿 적용 날짜: 통계 계산의 기준점으로 사용
+3. **앱 실행**
+```bash
+flutter run
+```
 
-## 설치 및 실행
+## 🔐 출시용 빌드 설정
 
-1. Flutter 개발 환경 설정
-2. 프로젝트 클론 또는 다운로드
-3. 의존성 설치:
-   ```bash
-   flutter pub get
-   ```
-4. 앱 실행:
-   ```bash
-   flutter run
-   ```
+### 1. 키스토어 설정
 
-## 사용법
+출시용 APK/AAB를 빌드하려면 키스토어 설정이 필요합니다:
 
-1. **템플릿 설정**: 첫 번째 탭에서 매일 반복할 할 일들을 추가
-2. **템플릿 적용**: "오늘부터 현재 템플릿 반영" 버튼 클릭
-3. **일일 체크**: 두 번째 탭에서 날짜를 선택하고 할 일들을 체크
-4. **통계 확인**: 세 번째 탭에서 완료율과 추이를 확인
+```bash
+# 1. 키스토어 설정 파일 생성
+cp android/key.properties.template android/key.properties
 
-## 주의사항
+# 2. key.properties 파일 편집
+# 실제 키스토어 정보로 수정하세요
+```
 
-- 템플릿은 최대 30개까지 추가 가능
-- 과거 6개월 이전 데이터는 자동 삭제
-- 미래 1개월까지만 Todo 확인 가능
-- 로컬 저장이므로 앱 삭제 시 데이터 손실
+### 2. 키스토어 파일 생성
 
-## 라이선스
+```bash
+# 새 키스토어 생성 (한 번만 실행)
+keytool -genkey -v -keystore android/habit-maker-key.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -alias habit-maker
+```
+
+### 3. 출시용 빌드
+
+```bash
+# AAB 파일 생성 (구글 플레이 스토어용)
+flutter build appbundle --release
+
+# APK 파일 생성 (직접 배포용)
+flutter build apk --release
+```
+
+## 📱 앱 구조
+
+```
+lib/
+├── main.dart                 # 앱 진입점
+├── models/                   # 데이터 모델
+├── screens/                  # 화면 위젯
+├── services/                 # 비즈니스 로직
+│   ├── ad_service.dart      # 광고 관리
+│   ├── notification_service.dart # 알림 관리
+│   ├── backup_service.dart  # 백업/복원
+│   └── storage_service.dart # 데이터 저장
+├── l10n/                    # 다국어 지원
+└── widgets/                 # 공통 위젯
+```
+
+## 🔒 보안 주의사항
+
+⚠️ **중요**: 다음 파일들은 절대 GitHub에 업로드하지 마세요!
+
+- `android/key.properties` - 키스토어 설정
+- `*.jks`, `*.keystore` - 키스토어 파일
+- `android/app/google-services.json` - Firebase 설정
+
+이 파일들은 `.gitignore`에 포함되어 있습니다.
+
+## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## 🤝 기여하기
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📞 연락처
+
+- 이메일: wjb127@naver.com
+- 개인정보 처리방침: [Privacy Policy](https://wjb127.github.io/todo-planner-app/privacy-policy)
+
+---
+
+**Made with ❤️ by Habit Maker Team**

@@ -26,9 +26,11 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
+**/ios/Flutter/flutter_export_environment.sh
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
@@ -43,3 +45,23 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# 🔐 보안 관련 파일들 (GitHub 업로드 금지)
+# 키스토어 파일들
+*.jks
+*.keystore
+android/key.properties
+android/local.properties
+
+# 민감한 설정 파일들
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# 로컬 환경 설정
+.env
+.env.local
+.env.production
+
+# 백업 파일들
+*-unsigned.aab
+*-unsigned.apk

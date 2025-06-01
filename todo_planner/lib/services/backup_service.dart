@@ -228,4 +228,53 @@ class BackupService {
     }
     return null;
   }
+
+  // 테스트용 샘플 데이터 생성
+  static Future<void> createSampleData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // 샘플 습관 템플릿 생성
+      final sampleTemplate = [
+        '물 8잔 마시기',
+        '30분 운동하기',
+        '독서 30분',
+        '일기 쓰기',
+        '명상 10분',
+        '비타민 섭취',
+        '스마트폰 사용 줄이기',
+        '일찍 잠자리에 들기',
+      ];
+      
+      await prefs.setStringList('template', sampleTemplate);
+      
+      // 샘플 일일 데이터 생성 (최근 7일)
+      final now = DateTime.now();
+      for (int i = 0; i < 7; i++) {
+        final date = now.subtract(Duration(days: i));
+        final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        
+        // 랜덤하게 일부 습관 완료 처리
+        final completedHabits = <String>[];
+        for (int j = 0; j < sampleTemplate.length; j++) {
+          if ((i + j) % 3 != 0) { // 약 66% 완료율
+            completedHabits.add(j.toString());
+          }
+        }
+        
+        await prefs.setStringList(dateKey, completedHabits);
+      }
+      
+      // 알림 설정도 활성화
+      await prefs.setBool('notification_enabled', true);
+      
+      debugPrint('Sample data created successfully');
+      
+      // 샘플 데이터 생성 후 백업 생성
+      await createBackup();
+      
+    } catch (e) {
+      debugPrint('Sample data creation failed: $e');
+    }
+  }
 } 
