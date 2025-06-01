@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
+import '../services/backup_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -11,6 +12,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationEnabled = false;
   bool _isLoading = true;
+  Map<String, dynamic>? _backupInfo;
 
   @override
   void initState() {
@@ -20,8 +22,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _loadSettings() async {
     final enabled = await NotificationService.isNotificationEnabled();
+    final backupInfo = await BackupService.getBackupInfo();
     setState(() {
       _notificationEnabled = enabled;
+      _backupInfo = backupInfo;
       _isLoading = false;
     });
   }
@@ -252,6 +256,196 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     
                     const SizedBox(height: 20),
                     
+                    // 데이터 백업/복원 섹션
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.backup_rounded,
+                                  color: Colors.green.shade600,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                '데이터 백업',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          // 백업 정보
+                          if (_backupInfo != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.green.shade50,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.green.shade200),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_rounded,
+                                        color: Colors.green.shade600,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        '백업 파일 존재',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '마지막 백업: ${_formatBackupDate(_backupInfo!['backup_date'])}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+                          
+                          // 백업 버튼들
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    setState(() => _isLoading = true);
+                                    try {
+                                      await BackupService.createBackup();
+                                      await _loadSettings(); // 백업 정보 새로고침
+                                      _showSnackBar('백업이 완료되었습니다! 🔒');
+                                    } catch (e) {
+                                      _showSnackBar('백업 중 오류가 발생했습니다: $e', isError: true);
+                                    } finally {
+                                      setState(() => _isLoading = false);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.backup_rounded),
+                                  label: const Text('백업 생성'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green.shade600,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _backupInfo != null ? () async {
+                                    final confirm = await _showConfirmDialog(
+                                      '데이터 복원',
+                                      '백업에서 데이터를 복원하시겠습니까?\n현재 데이터가 덮어씌워질 수 있습니다.',
+                                    );
+                                    if (confirm) {
+                                      setState(() => _isLoading = true);
+                                      try {
+                                        final success = await BackupService.restoreBackup();
+                                        if (success) {
+                                          _showSnackBar('데이터가 복원되었습니다! 🔄');
+                                        } else {
+                                          _showSnackBar('복원할 백업 데이터가 없습니다', isError: true);
+                                        }
+                                      } catch (e) {
+                                        _showSnackBar('복원 중 오류가 발생했습니다: $e', isError: true);
+                                      } finally {
+                                        setState(() => _isLoading = false);
+                                      }
+                                    }
+                                  } : null,
+                                  icon: const Icon(Icons.restore_rounded),
+                                  label: const Text('복원'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade600,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 12),
+                          
+                          // 자동 백업 안내
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.info_outline_rounded,
+                                  color: Colors.blue.shade600,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '매일 자동으로 백업이 생성됩니다. 앱 업데이트 시 데이터가 안전하게 보호됩니다.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.blue.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    const SizedBox(height: 20),
+                    
                     // 앱 정보 섹션
                     Container(
                       padding: const EdgeInsets.all(20),
@@ -417,5 +611,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  String _formatBackupDate(dynamic date) {
+    if (date is String) {
+      return date;
+    } else if (date is num) {
+      return DateTime.fromMillisecondsSinceEpoch(date.toInt()).toString();
+    } else {
+      throw Exception('Invalid date format');
+    }
+  }
+
+  Future<bool> _showConfirmDialog(String title, String message) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 } 

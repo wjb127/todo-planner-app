@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo_item.dart';
+import 'package:flutter/foundation.dart';
 
 class StorageService {
   static const String _templateKey = 'todo_template';
@@ -83,6 +84,21 @@ class StorageService {
         // 잘못된 날짜 형식의 키는 삭제
         await prefs.remove(key);
       }
+    }
+  }
+
+  // 기존 패키지명에서 데이터 마이그레이션 (선택사항)
+  static Future<void> migrateFromOldPackage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasMigrated = prefs.getBool('has_migrated_data') ?? false;
+    
+    if (!hasMigrated) {
+      // 마이그레이션 완료 표시
+      await prefs.setBool('has_migrated_data', true);
+      
+      // 여기에 기존 데이터 복구 로직을 추가할 수 있습니다
+      // 하지만 패키지명이 다르면 접근이 어렵습니다
+      debugPrint('Data migration check completed');
     }
   }
 } 

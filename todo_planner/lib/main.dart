@@ -7,9 +7,14 @@ import 'screens/settings_screen.dart';
 import 'services/ad_service.dart';
 import 'services/purchase_service.dart';
 import 'services/notification_service.dart';
+import 'services/backup_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // 데이터 마이그레이션 및 백업 시스템 초기화
+  await BackupService.migrateData();
+  await BackupService.autoBackup();
   
   // 알림 서비스 초기화
   await NotificationService.initialize();
