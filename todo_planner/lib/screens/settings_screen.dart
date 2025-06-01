@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
 import '../services/backup_service.dart';
+import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -38,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     try {
       if (value) {
         await NotificationService.scheduleDailyNotification();
-        _showSnackBar('매일 8시 알림이 설정되었습니다! 🔔');
+        _showSnackBar(_getLocalizations().notificationEnabled);
       } else {
         await NotificationService.cancelDailyNotification();
         _showSnackBar('알림이 해제되었습니다');
@@ -54,6 +55,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  AppLocalizations _getLocalizations() {
+    final locale = Localizations.localeOf(context);
+    return AppLocalizations(locale);
   }
 
   void _showSnackBar(String message, {bool isError = false}) {
@@ -72,11 +78,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = _getLocalizations();
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '설정',
-          style: TextStyle(
+        title: Text(
+          localizations.settings,
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
@@ -136,9 +144,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                               const SizedBox(width: 12),
-                              const Text(
-                                '알림 설정',
-                                style: TextStyle(
+                              Text(
+                                localizations.notificationSettings,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -147,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 20),
                           
-                          // 매일 8시 알림 설정
+                          // 매일 알림 설정
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -161,19 +169,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        '매일 8시 습관 알림',
-                                        style: TextStyle(
+                                      Text(
+                                        localizations.dailyHabitReminder,
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        '매일 오전 8시에 습관 체크를 알려드려요',
+                                        localizations.notificationDescription,
                                         style: TextStyle(
                                           fontSize: 14,
                                           color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // 현재 시간대 정보 표시
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.blue.shade50,
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.blue.shade200),
+                                        ),
+                                        child: Text(
+                                          NotificationService.getCurrentTimezoneInfo(),
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.blue.shade700,
+                                            fontFamily: 'monospace',
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -207,7 +233,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '알림이 활성화되었습니다. 매일 다양한 동기부여 메시지를 받아보세요!',
+                                      localizations.notificationEnabled,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.blue.shade700,
@@ -238,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   }
                                 },
                                 icon: const Icon(Icons.send_rounded),
-                                label: const Text('테스트 알림 보내기'),
+                                label: const Text('즉시 테스트 알림'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Theme.of(context).colorScheme.primary,
                                   foregroundColor: Colors.white,
@@ -489,7 +515,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           const SizedBox(height: 20),
                           
-                          _buildInfoRow('앱 이름', '습관메이커 (Habit Maker)'),
+                          _buildInfoRow('앱 이름', localizations.appTitle),
                           _buildInfoRow('버전', '1.0.0'),
                           _buildInfoRow('개발자', 'Habit Maker Team'),
                           _buildInfoRow('설명', '매일 반복하는 습관을 만들고 관리하는 앱'),

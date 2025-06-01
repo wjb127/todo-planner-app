@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/template_screen.dart';
 import 'screens/daily_screen.dart';
@@ -8,41 +10,57 @@ import 'services/ad_service.dart';
 import 'services/purchase_service.dart';
 import 'services/notification_service.dart';
 import 'services/backup_service.dart';
+import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 데이터 마이그레이션 및 백업 시스템 초기화
-  await BackupService.migrateData();
-  await BackupService.autoBackup();
+  // Google Mobile Ads 초기화
+  await MobileAds.instance.initialize();
   
   // 알림 서비스 초기화
   await NotificationService.initialize();
+  
+  // 데이터 마이그레이션 및 백업 시스템 초기화
+  await BackupService.migrateData();
+  await BackupService.autoBackup();
   
   // 알림이 활성화되어 있다면 다시 스케줄링
   if (await NotificationService.isNotificationEnabled()) {
     await NotificationService.scheduleDailyNotification();
   }
   
-  // 애드몹 초기화
+  // 광고 서비스 초기화
   await AdService.initialize();
   
-  runApp(const TodoPlannerApp());
+  runApp(const MyApp());
 }
 
-class TodoPlannerApp extends StatelessWidget {
-  const TodoPlannerApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '습관메이커',
+      title: 'Habit Maker',
+      debugShowCheckedModeBanner: false,
+      
+      // 다국어 지원 설정
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      
       theme: ThemeData(
-        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6366F1), // Indigo
+          seedColor: const Color(0xFF6366F1),
           brightness: Brightness.light,
         ),
+        useMaterial3: true,
+        fontFamily: 'Pretendard',
         appBarTheme: const AppBarTheme(
           elevation: 0,
           centerTitle: true,
@@ -99,7 +117,6 @@ class TodoPlannerApp extends StatelessWidget {
         ),
       ),
       home: const MainScreen(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -143,11 +160,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    
-    // 앱이 포그라운드로 돌아올 때 광고 표시 (첫 실행 제외)
-    if (state == AppLifecycleState.resumed && _hasShownInitialAd) {
-      _showInterstitialAd();
-    }
   }
 
   Future<void> _showInitialAd() async {
@@ -164,9 +176,11 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('습관메이커'),
+        title: Text(localizations?.appTitle ?? 'Habit Maker'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -199,37 +213,26 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) {
+          onTap: (index) async {
+            // 탭 변경 시 광고 표시 (너무 자주 나오지 않도록 조건 추가)
+            if (_currentIndex != index && index == 2) { // 통계 탭으로 이동할 때만
+              await _showInterstitialAd();
+            }
             setState(() {
               _currentIndex = index;
             });
           },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Colors.grey.shade600,
-          selectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 12,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
-          ),
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.assignment_outlined),
-              activeIcon: Icon(Icons.assignment),
+              icon: Icon(Icons.view_list_rounded),
               label: '반복 습관',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.today_outlined),
-              activeIcon: Icon(Icons.today),
-              label: '일일 습관 체크',
+              icon: Icon(Icons.today_rounded),
+              label: '일일 체크',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_outlined),
-              activeIcon: Icon(Icons.analytics),
+              icon: Icon(Icons.analytics_rounded),
               label: '통계',
             ),
           ],

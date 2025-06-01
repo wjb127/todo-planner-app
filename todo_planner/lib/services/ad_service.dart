@@ -4,6 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AdService {
   static const String _adRemovedKey = 'ad_removed';
+  static const String _testModeKey = 'test_mode';
+  
+  // 테스트 모드 설정 (개발 중에는 true로 설정)
+  static bool _isTestMode = false;
   
   // 실제 광고 ID
   static String get interstitialAdUnitId {
@@ -30,11 +34,15 @@ class AdService {
   // 애드몹 초기화
   static Future<void> initialize() async {
     await MobileAds.instance.initialize();
+    _isTestMode = await getTestMode();
     _loadInterstitialAd();
   }
 
   // 전면 광고 로드
   static void _loadInterstitialAd() {
+    // 테스트 모드에서는 광고 로드하지 않음
+    if (_isTestMode) return;
+    
     InterstitialAd.load(
       adUnitId: interstitialAdUnitId,
       request: const AdRequest(),
@@ -67,6 +75,12 @@ class AdService {
 
   // 전면 광고 표시
   static Future<void> showInterstitialAd() async {
+    // 테스트 모드에서는 광고 표시하지 않음
+    if (_isTestMode) {
+      print('🧪 테스트 모드: 광고 표시 건너뜀');
+      return;
+    }
+    
     final adRemoved = await isAdRemoved();
     if (adRemoved) return;
     
@@ -86,6 +100,30 @@ class AdService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_adRemovedKey, removed);
   }
+
+  // 테스트 모드 상태 확인
+  static Future<bool> getTestMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_testModeKey) ?? false;
+  }
+
+  // 테스트 모드 설정
+  static Future<void> setTestMode(bool testMode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_testModeKey, testMode);
+    _isTestMode = testMode;
+    
+    if (testMode) {
+      // 테스트 모드 활성화 시 기존 광고 정리
+      dispose();
+    } else {
+      // 테스트 모드 비활성화 시 광고 다시 로드
+      _loadInterstitialAd();
+    }
+  }
+
+  // 현재 테스트 모드 상태
+  static bool get isTestMode => _isTestMode;
 
   // 리소스 정리
   static void dispose() {

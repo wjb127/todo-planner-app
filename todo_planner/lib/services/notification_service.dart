@@ -6,26 +6,25 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   static const String _notificationEnabledKey = 'notification_enabled';
   
-  // 다양한 후킹 멘트들
-  static final List<String> _motivationalMessages = [
-    '🌅 새로운 하루, 새로운 습관! 오늘도 성장해보세요',
-    '💪 작은 습관이 큰 변화를 만듭니다. 시작해볼까요?',
-    '⭐ 오늘의 습관 체크 시간이에요! 꾸준함이 힘입니다',
-    '🎯 목표를 향한 한 걸음! 오늘 할 일을 확인해보세요',
-    '🔥 습관의 힘을 믿어보세요. 오늘도 화이팅!',
-    '🌱 매일 조금씩, 더 나은 나로 성장하고 있어요',
-    '✨ 완벽하지 않아도 괜찮아요. 시작하는 것이 중요해요',
-    '🚀 오늘도 습관 메이커가 되어보세요!',
-    '💎 다이아몬드도 매일 갈아야 빛이 나요. 오늘도 갈아볼까요?',
-    '🎨 오늘의 습관으로 인생이라는 캔버스를 채워보세요',
-    '🏆 챔피언은 하루아침에 만들어지지 않아요. 오늘도 도전!',
-    '🌟 별은 어둠 속에서 빛나듯, 꾸준함 속에서 성장해요'
-  ];
+  // 지원하는 국가별 시간대 매핑
+  static const Map<String, String> _countryTimezones = {
+    'KR': 'Asia/Seoul',        // 한국
+    'JP': 'Asia/Tokyo',        // 일본
+    'US': 'America/New_York',  // 미국 동부
+    'CA': 'America/Toronto',   // 캐나다
+    'GB': 'Europe/London',     // 영국
+    'DE': 'Europe/Berlin',     // 독일
+    'FR': 'Europe/Paris',      // 프랑스
+    'AU': 'Australia/Sydney',  // 호주
+    'CN': 'Asia/Shanghai',     // 중국
+    'IN': 'Asia/Kolkata',      // 인도
+  };
 
   static Future<void> initialize() async {
     // 타임존 초기화
@@ -52,8 +51,81 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
     
+    // Android 알림 채널 생성
+    if (Platform.isAndroid) {
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'daily_habit_reminder',
+        '일일 습관 알림',
+        description: '매일 정해진 시간에 습관 체크를 알려드립니다',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+        showBadge: true,
+        enableLights: true,
+        ledColor: Color(0xFF2196F3),
+      );
+      
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      
+      await androidImplementation?.createNotificationChannel(channel);
+      debugPrint('Notification channel created: ${channel.id}');
+    }
+    
     // 권한 요청
     await _requestPermissions();
+  }
+
+  // 사용자의 현재 시간대 자동 감지
+  static tz.Location _getUserTimezone() {
+    try {
+      // 1. 시스템 로케일에서 국가 코드 추출 시도
+      final locale = Platform.localeName; // 예: "ko_KR", "en_US", "ja_JP"
+      debugPrint('System locale: $locale');
+      
+      if (locale.contains('_')) {
+        final countryCode = locale.split('_').last.toUpperCase();
+        debugPrint('Detected country code: $countryCode');
+        
+        if (_countryTimezones.containsKey(countryCode)) {
+          final timezoneName = _countryTimezones[countryCode]!;
+          debugPrint('Using timezone: $timezoneName');
+          return tz.getLocation(timezoneName);
+        }
+      }
+      
+      // 2. 시스템 시간대 사용 (fallback)
+      debugPrint('Using system local timezone');
+      return tz.local;
+    } catch (e) {
+      debugPrint('Error detecting timezone: $e, using UTC');
+      return tz.UTC;
+    }
+  }
+
+  // 현재 로케일 감지
+  static String _getCurrentLanguageCode() {
+    try {
+      final locale = Platform.localeName;
+      if (locale.contains('_')) {
+        return locale.split('_').first.toLowerCase();
+      }
+      return locale.toLowerCase();
+    } catch (e) {
+      return 'en'; // 기본값
+    }
+  }
+
+  // 로케일에 맞는 AppLocalizations 생성
+  static AppLocalizations _getLocalizations() {
+    final languageCode = _getCurrentLanguageCode();
+    final supportedLanguages = ['ko', 'ja', 'en'];
+    
+    final locale = supportedLanguages.contains(languageCode) 
+        ? Locale(languageCode) 
+        : const Locale('en');
+    
+    return AppLocalizations(locale);
   }
 
   static Future<void> _requestPermissions() async {
@@ -68,9 +140,17 @@ class NotificationService {
       }
       
       // 정확한 알람 권한도 요청 (Android 12+)
-      if (Platform.isAndroid) {
-        await Permission.scheduleExactAlarm.request();
+      final alarmStatus = await Permission.scheduleExactAlarm.request();
+      debugPrint('Exact alarm permission status: $alarmStatus');
+      
+      // 배터리 최적화 예외 요청
+      try {
+        final batteryOptimizationStatus = await Permission.ignoreBatteryOptimizations.request();
+        debugPrint('Battery optimization permission status: $batteryOptimizationStatus');
+      } catch (e) {
+        debugPrint('Battery optimization permission request failed: $e');
       }
+      
     } else if (Platform.isIOS) {
       final result = await _notifications
           .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
@@ -84,7 +164,6 @@ class NotificationService {
   }
 
   static void _onNotificationTapped(NotificationResponse response) {
-    // 알림 탭 시 앱 내 특정 페이지로 이동하는 로직을 여기에 추가할 수 있습니다
     debugPrint('Notification tapped: ${response.payload}');
   }
 
@@ -98,58 +177,142 @@ class NotificationService {
       }
     }
     
-    // 랜덤 메시지 선택
-    final random = Random();
-    final message = _motivationalMessages[random.nextInt(_motivationalMessages.length)];
+    // 기존 알림 모두 취소
+    await _notifications.cancelAll();
+    debugPrint('Cancelled all existing notifications');
     
-    final scheduledTime = _nextInstanceOfEightAM();
-    debugPrint('Scheduling notification for: $scheduledTime');
-    debugPrint('Notification message: $message');
+    // 8시 알림 스케줄링 (아침)
+    await _scheduleNotificationAt(8, 0, 0, 'morning');
     
-    await _notifications.zonedSchedule(
-      0, // 알림 ID
-      '습관메이커', // 제목
-      message, // 내용
-      scheduledTime, // 다음 8시
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'daily_habit_reminder',
-          '일일 습관 알림',
-          channelDescription: '매일 8시에 습관 체크를 알려드립니다',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      matchDateTimeComponents: DateTimeComponents.time, // 매일 반복
-    );
+    // 13시 알림 스케줄링 (오후)
+    await _scheduleNotificationAt(13, 0, 1, 'afternoon');
+    
+    // 18시 알림 스케줄링 (저녁)
+    await _scheduleNotificationAt(18, 0, 2, 'evening');
     
     // 설정 저장
     await setNotificationEnabled(true);
-    debugPrint('Daily notification scheduled successfully');
+    debugPrint('Daily notifications scheduled successfully (8:00 AM, 1:00 PM, 6:00 PM)');
   }
 
-  static tz.TZDateTime _nextInstanceOfEightAM() {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, 8);
+  static Future<void> _scheduleNotificationAt(int hour, int minute, int notificationId, String timeOfDay) async {
+    final localizations = _getLocalizations();
     
-    if (scheduledDate.isBefore(now)) {
+    // 시간대별 메시지 선택
+    List<String> messages;
+    String title;
+    
+    switch (timeOfDay) {
+      case 'morning':
+        messages = localizations.morningMessages;
+        title = localizations.appTitle + ' (Morning)';
+        break;
+      case 'afternoon':
+        messages = localizations.afternoonMessages;
+        title = localizations.appTitle + ' (Afternoon)';
+        break;
+      case 'evening':
+        messages = localizations.eveningMessages;
+        title = localizations.appTitle + ' (Evening)';
+        break;
+      default:
+        messages = localizations.motivationalMessages;
+        title = localizations.appTitle;
+    }
+    
+    // 랜덤 메시지 선택
+    final random = Random();
+    final message = messages[random.nextInt(messages.length)];
+    
+    final scheduledTime = _nextInstanceOfTime(hour, minute);
+    debugPrint('=== NOTIFICATION SCHEDULING DEBUG ===');
+    final userTimezone = _getUserTimezone();
+    final now = tz.TZDateTime.now(userTimezone);
+    debugPrint('User timezone: ${userTimezone.name}');
+    debugPrint('Current time (${userTimezone.name}): $now');
+    debugPrint('Scheduling $title notification for: $scheduledTime');
+    debugPrint('Time difference: ${scheduledTime.difference(now).inMinutes} minutes from now');
+    debugPrint('Notification ID: $notificationId');
+    debugPrint('Notification message: $message');
+    
+    // 권한 상태 확인
+    if (Platform.isAndroid) {
+      final notificationStatus = await Permission.notification.status;
+      final alarmStatus = await Permission.scheduleExactAlarm.status;
+      debugPrint('Notification permission: $notificationStatus');
+      debugPrint('Exact alarm permission: $alarmStatus');
+    }
+    
+    try {
+      await _notifications.zonedSchedule(
+        notificationId, // 알림 ID (8시: 0, 13시: 1, 18시: 2)
+        title, // 제목
+        message, // 내용
+        scheduledTime, // 지정된 시간
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'daily_habit_reminder',
+            '일일 습관 알림',
+            channelDescription: '매일 정해진 시간에 습관 체크를 알려드립니다',
+            importance: Importance.max,
+            priority: Priority.high,
+            icon: '@mipmap/ic_launcher',
+            enableVibration: true,
+            playSound: true,
+            showWhen: true,
+            autoCancel: false,
+            ongoing: false,
+            styleInformation: const BigTextStyleInformation(''),
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+            interruptionLevel: InterruptionLevel.active,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time, // 매일 반복
+      );
+      debugPrint('✅ Notification scheduled successfully!');
+      
+      // 스케줄된 알림 목록 확인
+      final pendingNotifications = await _notifications.pendingNotificationRequests();
+      debugPrint('Pending notifications count: ${pendingNotifications.length}');
+      for (final notification in pendingNotifications) {
+        debugPrint('Pending: ID=${notification.id}, Title=${notification.title}');
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to schedule notification: $e');
+    }
+    debugPrint('=== END DEBUG ===');
+  }
+
+  static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+    final userTimezone = _getUserTimezone();
+    final tz.TZDateTime now = tz.TZDateTime.now(userTimezone);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(userTimezone, now.year, now.month, now.day, hour, minute);
+    
+    // 현재 시간보다 이전이면 다음 날로 설정
+    if (scheduledDate.isBefore(now) || scheduledDate.isAtSameMomentAs(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
+    
+    debugPrint('Next instance calculation:');
+    debugPrint('  Current time: $now');
+    debugPrint('  Target time today: ${tz.TZDateTime(userTimezone, now.year, now.month, now.day, hour, minute)}');
+    debugPrint('  Final scheduled time: $scheduledDate');
     
     return scheduledDate;
   }
 
   static Future<void> cancelDailyNotification() async {
-    await _notifications.cancel(0);
+    await _notifications.cancel(0); // 8시 알림 취소
+    await _notifications.cancel(1); // 13시 알림 취소
+    await _notifications.cancel(2); // 18시 알림 취소
     await setNotificationEnabled(false);
+    debugPrint('All daily notifications cancelled');
   }
 
   static Future<bool> isNotificationEnabled() async {
@@ -172,31 +335,66 @@ class NotificationService {
     }
   }
 
-  // 테스트용 즉시 알림
+  // 즉시 테스트 알림 (출시용 - 간단한 테스트만)
   static Future<void> sendTestNotification() async {
+    final localizations = _getLocalizations();
     final random = Random();
-    final message = _motivationalMessages[random.nextInt(_motivationalMessages.length)];
+    final message = localizations.motivationalMessages[random.nextInt(localizations.motivationalMessages.length)];
     
     await _notifications.show(
       999, // 테스트용 ID
-      '습관메이커 (테스트)',
+      localizations.appTitle + ' (Test)',
       message,
       const NotificationDetails(
         android: AndroidNotificationDetails(
-          'test_notification',
-          '테스트 알림',
+          'daily_habit_reminder',
+          '일일 습관 알림',
           channelDescription: '알림 테스트용',
-          importance: Importance.high,
+          importance: Importance.max,
           priority: Priority.high,
           icon: '@mipmap/ic_launcher',
+          enableVibration: true,
+          playSound: true,
         ),
         iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          interruptionLevel: InterruptionLevel.active,
         ),
       ),
     );
     debugPrint('Test notification sent: $message');
+  }
+
+  // 현재 설정된 시간대 정보 가져오기 (디버그용)
+  static String getCurrentTimezoneInfo() {
+    final userTimezone = _getUserTimezone();
+    final now = tz.TZDateTime.now(userTimezone);
+    return 'Timezone: ${userTimezone.name}, Current time: $now';
+  }
+
+  // 알림 권한 상태 확인
+  static Future<Map<String, String>> getPermissionStatus() async {
+    final Map<String, String> status = {};
+    
+    if (Platform.isAndroid) {
+      final notificationStatus = await Permission.notification.status;
+      final alarmStatus = await Permission.scheduleExactAlarm.status;
+      final batteryStatus = await Permission.ignoreBatteryOptimizations.status;
+      
+      status['notification'] = notificationStatus.toString();
+      status['exactAlarm'] = alarmStatus.toString();
+      status['batteryOptimization'] = batteryStatus.toString();
+    } else if (Platform.isIOS) {
+      status['notification'] = 'iOS - Check in Settings';
+    }
+    
+    return status;
+  }
+
+  // 모든 예약된 알림 목록 가져오기
+  static Future<List<PendingNotificationRequest>> getPendingNotifications() async {
+    return await _notifications.pendingNotificationRequests();
   }
 } 

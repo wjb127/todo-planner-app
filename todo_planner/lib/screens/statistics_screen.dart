@@ -31,6 +31,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
     super.didChangeDependencies();
     // 페이지가 다시 보여질 때마다 데이터 새로고침
     _loadStatistics();
+    // 통계 화면 진입 시 광고 표시
+    _showAdOnStatisticsView();
+  }
+
+  Future<void> _showAdOnStatisticsView() async {
+    // 잠시 후 광고 표시 (UI 로딩 후)
+    await Future.delayed(const Duration(milliseconds: 500));
+    await AdService.showInterstitialAd();
   }
 
   String _formatDate(DateTime date) {
