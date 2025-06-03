@@ -99,15 +99,15 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
     final selected = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
     
     if (selected == today) {
-      return '오늘';
+      return 'Today';
     } else if (selected == today.subtract(const Duration(days: 1))) {
-      return '어제';
+      return 'Yesterday';
     } else if (selected == today.add(const Duration(days: 1))) {
-      return '내일';
+      return 'Tomorrow';
     } else {
-      final weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+      final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       final weekday = weekdays[_selectedDate.weekday - 1];
-      return '${_selectedDate.month}월 ${_selectedDate.day}일 ($weekday)';
+      return '${_selectedDate.month}/${_selectedDate.day} ($weekday)';
     }
   }
 
@@ -160,7 +160,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            '일일 습관 체크',
+                            'Daily Habit Check',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -169,7 +169,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '오늘의 습관을 확인하고 체크하세요',
+                            'Check and track your daily habits',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
@@ -186,7 +186,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                       child: IconButton(
                         onPressed: _loadDailyData,
                         icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                        tooltip: '새로고침',
+                        tooltip: 'Refresh',
                       ),
                     ),
                   ],
@@ -283,7 +283,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      '완료: ${_getCompletedCount()}/${_dailyTodos.length}',
+                                      'Completed: ${_getCompletedCount()}/${_dailyTodos.length}',
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
@@ -367,7 +367,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    '이 날짜에는 할 일이 없습니다',
+                                    'No tasks for this date',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.grey.shade600,
@@ -377,7 +377,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    '템플릿을 설정하고 새로고침을 눌러주세요',
+                                    'Set up templates and tap refresh',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
@@ -388,7 +388,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ElevatedButton.icon(
                                     onPressed: _loadDailyData,
                                     icon: const Icon(Icons.refresh_rounded),
-                                    label: const Text('새로고침'),
+                                    label: const Text('Refresh'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(context).colorScheme.primary,
                                       foregroundColor: Colors.white,

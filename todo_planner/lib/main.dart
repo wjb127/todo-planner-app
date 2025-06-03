@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en', 'US'), // 영어로 강제 설정
       
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -195,7 +196,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               );
             },
             icon: const Icon(Icons.settings_rounded),
-            tooltip: '설정',
+            tooltip: 'Settings',
           ),
         ],
       ),
@@ -227,15 +228,15 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.view_list_rounded),
-              label: '반복 습관',
+              label: 'Templates',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.today_rounded),
-              label: '일일 체크',
+              label: 'Daily',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.analytics_rounded),
-              label: '통계',
+              label: 'Statistics',
             ),
           ],
         ),

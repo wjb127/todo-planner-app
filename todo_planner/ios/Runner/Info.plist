@@ -54,6 +54,10 @@
 	<key>NSUserTrackingUsageDescription</key>
 	<string>이 앱은 더 나은 광고 경험을 제공하기 위해 데이터를 사용합니다.</string>
 	
+	<!-- 알림 권한 -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>습관 알림을 받기 위해 알림 권한이 필요합니다.</string>
+	
 	<!-- SKAdNetwork 식별자들 -->
 	<key>SKAdNetworkItems</key>
 	<array>

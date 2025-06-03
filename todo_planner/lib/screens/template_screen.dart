@@ -33,38 +33,85 @@ class _TemplateScreenState extends State<TemplateScreen> {
     await StorageService.saveTemplate(_templateItems);
   }
 
-  void _addTodoItem() {
-    if (_textController.text.trim().isEmpty) return;
-    if (_templateItems.length >= 30) {
-      _showSnackBar('최대 30개까지만 추가할 수 있습니다.', isError: true);
-      return;
+  void _addHabit() {
+    final text = _textController.text.trim();
+    if (text.isNotEmpty) {
+      setState(() {
+        _templateItems.add(TodoItem(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: text,
+          isCompleted: false,
+        ));
+      });
+      _textController.clear();
+      _saveTemplate();
+      _showSnackBar('Habit added successfully!');
     }
-
-    setState(() {
-      _templateItems.add(TodoItem(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: _textController.text.trim(),
-      ));
-    });
-    _textController.clear();
-    _saveTemplate();
-    _showSnackBar('습관이 추가되었습니다.');
   }
 
-  void _removeTodoItem(int index) {
-    setState(() {
-      _templateItems.removeAt(index);
-    });
-    _saveTemplate();
-    _showSnackBar('습관이 삭제되었습니다.');
+  void _editHabit(int index) {
+    _textController.text = _templateItems[index].title;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Habit'),
+        content: TextField(
+          controller: _textController,
+          decoration: const InputDecoration(
+            hintText: 'Enter habit name',
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              final text = _textController.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  _templateItems[index] = _templateItems[index].copyWith(title: text);
+                });
+                _saveTemplate();
+                _showSnackBar('Habit updated successfully!');
+              }
+              _textController.clear();
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
   }
 
-  void _editTodoItem(int index, String newTitle) {
-    setState(() {
-      _templateItems[index] = _templateItems[index].copyWith(title: newTitle);
-    });
-    _saveTemplate();
-    _showSnackBar('습관이 수정되었습니다.');
+  void _deleteHabit(int index) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Habit'),
+        content: Text('Are you sure you want to delete "${_templateItems[index].title}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _templateItems.removeAt(index);
+              });
+              _saveTemplate();
+              _showSnackBar('Habit deleted successfully!');
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _reorderItems(int oldIndex, int newIndex) {
@@ -76,12 +123,12 @@ class _TemplateScreenState extends State<TemplateScreen> {
       _templateItems.insert(newIndex, item);
     });
     _saveTemplate();
-    _showSnackBar('순서가 변경되었습니다.');
+    _showSnackBar('Order has been changed.');
   }
 
   Future<void> _applyTemplateFromToday() async {
     if (_templateItems.isEmpty) {
-      _showSnackBar('템플릿에 습관을 먼저 추가해주세요.', isError: true);
+      _showSnackBar('Please add habits to the template first.', isError: true);
       return;
     }
 
@@ -135,13 +182,13 @@ class _TemplateScreenState extends State<TemplateScreen> {
     // 결과 메시지
     String message = '';
     if (todayApplied && futureDaysApplied > 0) {
-      message = '✅ 오늘부터 ${futureDaysApplied + 1}일간 새로운 습관 템플릿이 적용되었습니다!';
+      message = '✅ New habit template applied for ${futureDaysApplied + 1} days starting from today!';
     } else if (todaySkipped && futureDaysApplied > 0) {
-      message = '✅ 오늘은 건너뛰고 내일부터 ${futureDaysApplied}일간 새로운 습관 템플릿이 적용되었습니다!';
+      message = '✅ Today skipped, new habit template applied for ${futureDaysApplied} days starting tomorrow!';
     } else if (todayApplied && futureDaysApplied == 0) {
-      message = '✅ 오늘에만 새로운 습관 템플릿이 적용되었습니다!';
+      message = '✅ New habit template applied for today only!';
     } else {
-      message = '템플릿 적용에 문제가 발생했습니다.';
+      message = 'There was a problem applying the template.';
     }
     
     _showSnackBar(message);
@@ -159,45 +206,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
         ),
       );
     }
-  }
-
-  void _showEditDialog(int index) {
-    final controller = TextEditingController(text: _templateItems[index].title);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          '습관 수정',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: '습관을 입력하세요',
-          ),
-          autofocus: true,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              '취소',
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (controller.text.trim().isNotEmpty) {
-                _editTodoItem(index, controller.text.trim());
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('저장'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -245,7 +253,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 child: Column(
                   children: [
                     const Text(
-                      '반복 습관 템플릿',
+                      'Habit Templates',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -254,7 +262,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '매일 반복할 습관들을 설정하세요',
+                      'Create and manage your daily habit templates',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -287,16 +295,16 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           child: TextField(
                             controller: _textController,
                             decoration: const InputDecoration(
-                              hintText: '새로운 습관 추가',
-                              prefixIcon: Icon(Icons.add_task_rounded),
+                              hintText: 'Enter new habit',
+                              border: InputBorder.none,
                             ),
-                            onSubmitted: (_) => _addTodoItem(),
+                            onSubmitted: (_) => _addHabit(),
                           ),
                         ),
                         const SizedBox(width: 12),
                         ElevatedButton(
-                          onPressed: _addTodoItem,
-                          child: const Text('추가'),
+                          onPressed: _addHabit,
+                          child: const Text('Add'),
                         ),
                       ],
                     ),
@@ -304,7 +312,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     Row(
                       children: [
                         Text(
-                          '${_templateItems.length}/30개',
+                          '${_templateItems.length}/30 habits',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade600,
@@ -320,7 +328,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '드래그하여 순서 변경',
+                            'Drag to reorder',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -359,26 +367,28 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
-                                    Icons.assignment_outlined,
+                                    Icons.add_task_rounded,
                                     size: 64,
                                     color: Colors.grey.shade400,
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    '템플릿에 습관을 추가해보세요!',
+                                    'No habits in template',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    '매일 반복할 루틴을 만들어보세요',
+                                    'Add your first habit above',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ],
                               ),
@@ -423,7 +433,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                               ),
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(12),
-                                onTap: () => _showEditDialog(index),
+                                onTap: () => _editHabit(index),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -472,7 +482,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                           color: Colors.red.shade600,
                                           size: 18,
                                         ),
-                                        onPressed: () => _removeTodoItem(index),
+                                        onPressed: () => _deleteHabit(index),
                                         padding: const EdgeInsets.all(6),
                                         constraints: const BoxConstraints(
                                           minWidth: 28,
@@ -504,7 +514,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _applyTemplateFromToday,
                   icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('오늘부터 습관 템플릿 적용하기'),
+                  label: const Text('Apply Habit Template from Today'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.white.withOpacity(0.9),

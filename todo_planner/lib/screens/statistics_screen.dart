@@ -140,18 +140,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
   }
 
   String _getTitle(double averageRate) {
-    if (averageRate >= 0.95) return "완벽주의자";
-    if (averageRate >= 0.90) return "철인";
-    if (averageRate >= 0.85) return "성실한 자";
-    if (averageRate >= 0.80) return "근면한 자";
-    if (averageRate >= 0.75) return "부지런한 자";
-    if (averageRate >= 0.70) return "꾸준한 자";
-    if (averageRate >= 0.65) return "노력하는 자";
-    if (averageRate >= 0.60) return "시도하는 자";
-    if (averageRate >= 0.50) return "게으른 자";
-    if (averageRate >= 0.30) return "나태한 자";
-    if (averageRate >= 0.10) return "무기력한 자";
-    return "잠자는 자";
+    if (averageRate >= 0.95) return "Perfectionist";
+    if (averageRate >= 0.90) return "Iron Will";
+    if (averageRate >= 0.85) return "Diligent";
+    if (averageRate >= 0.80) return "Hardworking";
+    if (averageRate >= 0.75) return "Industrious";
+    if (averageRate >= 0.70) return "Consistent";
+    if (averageRate >= 0.65) return "Trying";
+    if (averageRate >= 0.60) return "Attempting";
+    if (averageRate >= 0.50) return "Lazy";
+    if (averageRate >= 0.30) return "Sluggish";
+    if (averageRate >= 0.10) return "Lethargic";
+    return "Sleeper";
   }
 
   Color _getTitleColor(double averageRate) {
@@ -212,7 +212,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              '통계',
+                              'Statistics',
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
@@ -221,7 +221,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              '습관 완료율과 진행 상황을 확인하세요',
+                              'Check your habit completion rates and progress',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white.withOpacity(0.9),
@@ -238,7 +238,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         child: IconButton(
                           onPressed: _loadStatistics,
                           icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                          tooltip: '새로고침',
+                          tooltip: 'Refresh',
                         ),
                       ),
                     ],
@@ -256,7 +256,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          '템플릿을 설정하고 새로고침을 눌러주세요',
+                          'Set up templates and tap refresh',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.white.withOpacity(0.9),
@@ -268,7 +268,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         ElevatedButton.icon(
                           onPressed: _loadStatistics,
                           icon: const Icon(Icons.refresh_rounded),
-                          label: const Text('새로고침'),
+                          label: const Text('Refresh'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withOpacity(0.9),
                             foregroundColor: Theme.of(context).colorScheme.primary,
@@ -318,7 +318,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            '통계',
+                            'Statistics',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -327,7 +327,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '습관 완료율과 진행 상황을 확인하세요',
+                            'Check your habit completion rates and progress',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
@@ -344,7 +344,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                       child: IconButton(
                         onPressed: _loadStatistics,
                         icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                        tooltip: '새로고침',
+                        tooltip: 'Refresh',
                       ),
                     ),
                   ],
@@ -392,7 +392,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                   ),
                                   const SizedBox(width: 12),
                                   const Text(
-                                    '일별 완료율 추이',
+                                    'Daily Completion Trend',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -519,7 +519,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
-                                  '항목별 습관 완료율',
+                                  'Habit Completion Rates',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -534,7 +534,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                 child: Padding(
                                   padding: const EdgeInsets.all(20),
                                   child: Text(
-                                    '통계 데이터가 없습니다.',
+                                    'No statistics data found.',
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 16,
@@ -645,7 +645,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                 ),
                                 const SizedBox(width: 12),
                                 const Text(
-                                  '요약',
+                                  'Summary',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -654,14 +654,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                               ],
                             ),
                             const SizedBox(height: 16),
-                            _buildSummaryRow('분석 기간', '최근 30일 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "없음"} ~ ${_formatDate(DateTime.now())})'),
-                            _buildSummaryRow('총 분석 일수', '${_statisticsData.length}일'),
-                            _buildSummaryRow('템플릿 항목 수', '${_template.length}개'),
+                            _buildSummaryRow('Analysis Period', 'Last 30 days (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "None"} ~ ${_formatDate(DateTime.now())})'),
+                            _buildSummaryRow('Total Analysis Days', '${_statisticsData.length} days'),
+                            _buildSummaryRow('Template Items', '${_template.length} habits'),
                             if (completionRates.isNotEmpty) ...[
                               const SizedBox(height: 8),
-                              _buildSummaryRow('평균 완료율', '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'),
-                              _buildSummaryRow('최고 완료율', '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'),
-                              _buildSummaryRow('최저 완료율', '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'),
+                              _buildSummaryRow('Average Completion Rate', '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'),
+                              _buildSummaryRow('Highest Completion Rate', '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'),
+                              _buildSummaryRow('Lowest Completion Rate', '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'),
                               const SizedBox(height: 12),
                               Container(
                                 width: double.infinity,
@@ -688,7 +688,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      '칭호',
+                                      'Title',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey.shade600,
