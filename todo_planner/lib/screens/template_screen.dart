@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../models/todo_item.dart';
 import '../services/storage_service.dart';
+import '../l10n/app_localizations.dart';
 
 class TemplateScreen extends StatefulWidget {
   const TemplateScreen({super.key});
@@ -34,6 +35,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   void _addHabit() {
+    final localizations = AppLocalizations.of(context);
     final text = _textController.text.trim();
     if (text.isNotEmpty) {
       setState(() {
@@ -45,27 +47,32 @@ class _TemplateScreenState extends State<TemplateScreen> {
       });
       _textController.clear();
       _saveTemplate();
-      _showSnackBar('Habit added successfully!');
+      _showSnackBar(localizations?.locale.languageCode == 'ko' ? '습관이 추가되었습니다!' :
+                   localizations?.locale.languageCode == 'ja' ? '習慣が追加されました！' : 'Habit added successfully!');
     }
   }
 
   void _editHabit(int index) {
+    final localizations = AppLocalizations.of(context);
     _textController.text = _templateItems[index].title;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Habit'),
+        title: Text(localizations?.locale.languageCode == 'ko' ? '습관 수정' :
+                   localizations?.locale.languageCode == 'ja' ? '習慣編集' : 'Edit Habit'),
         content: TextField(
           controller: _textController,
-          decoration: const InputDecoration(
-            hintText: 'Enter habit name',
+          decoration: InputDecoration(
+            hintText: localizations?.locale.languageCode == 'ko' ? '습관을 입력하세요' :
+                     localizations?.locale.languageCode == 'ja' ? '習慣を入力してください' : 'Enter habit name',
           ),
           autofocus: true,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(localizations?.locale.languageCode == 'ko' ? '취소' :
+                        localizations?.locale.languageCode == 'ja' ? 'キャンセル' : 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -75,12 +82,14 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   _templateItems[index] = _templateItems[index].copyWith(title: text);
                 });
                 _saveTemplate();
-                _showSnackBar('Habit updated successfully!');
+                _showSnackBar(localizations?.locale.languageCode == 'ko' ? '습관이 수정되었습니다!' :
+                             localizations?.locale.languageCode == 'ja' ? '習慣が編集されました！' : 'Habit updated successfully!');
               }
               _textController.clear();
               Navigator.pop(context);
             },
-            child: const Text('Save'),
+            child: Text(localizations?.locale.languageCode == 'ko' ? '저장' :
+                        localizations?.locale.languageCode == 'ja' ? '保存' : 'Save'),
           ),
         ],
       ),
@@ -88,15 +97,19 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   void _deleteHabit(int index) {
+    final localizations = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Habit'),
-        content: Text('Are you sure you want to delete "${_templateItems[index].title}"?'),
+        title: Text(localizations?.locale.languageCode == 'ko' ? '습관 삭제' :
+                   localizations?.locale.languageCode == 'ja' ? '習慣削除' : 'Delete Habit'),
+        content: Text(localizations?.locale.languageCode == 'ko' ? '"${_templateItems[index].title}"을(를) 삭제하시겠습니까?' :
+                     localizations?.locale.languageCode == 'ja' ? '"${_templateItems[index].title}"を削除しますか？' : 'Are you sure you want to delete "${_templateItems[index].title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(localizations?.locale.languageCode == 'ko' ? '취소' :
+                        localizations?.locale.languageCode == 'ja' ? 'キャンセル' : 'Cancel'),
           ),
           TextButton(
             onPressed: () {
@@ -104,10 +117,12 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 _templateItems.removeAt(index);
               });
               _saveTemplate();
-              _showSnackBar('Habit deleted successfully!');
+              _showSnackBar(localizations?.locale.languageCode == 'ko' ? '습관이 삭제되었습니다!' :
+                           localizations?.locale.languageCode == 'ja' ? '習慣が削除されました！' : 'Habit deleted successfully!');
               Navigator.pop(context);
             },
-            child: const Text('Delete'),
+            child: Text(localizations?.locale.languageCode == 'ko' ? '삭제' :
+                        localizations?.locale.languageCode == 'ja' ? '削除' : 'Delete'),
           ),
         ],
       ),
@@ -115,6 +130,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   }
 
   void _reorderItems(int oldIndex, int newIndex) {
+    final localizations = AppLocalizations.of(context);
     setState(() {
       if (newIndex > oldIndex) {
         newIndex -= 1;
@@ -123,12 +139,15 @@ class _TemplateScreenState extends State<TemplateScreen> {
       _templateItems.insert(newIndex, item);
     });
     _saveTemplate();
-    _showSnackBar('Order has been changed.');
+    _showSnackBar(localizations?.locale.languageCode == 'ko' ? '순서가 변경되었습니다.' :
+                 localizations?.locale.languageCode == 'ja' ? '順序が変更されました。' : 'Order has been changed.');
   }
 
   Future<void> _applyTemplateFromToday() async {
+    final localizations = AppLocalizations.of(context);
     if (_templateItems.isEmpty) {
-      _showSnackBar('Please add habits to the template first.', isError: true);
+      _showSnackBar(localizations?.locale.languageCode == 'ko' ? '템플릿에 습관을 먼저 추가해주세요.' :
+                   localizations?.locale.languageCode == 'ja' ? 'テンプレートに習慣を先に追加してください。' : 'Please add habits to the template first.', isError: true);
       return;
     }
 
@@ -182,13 +201,17 @@ class _TemplateScreenState extends State<TemplateScreen> {
     // 결과 메시지
     String message = '';
     if (todayApplied && futureDaysApplied > 0) {
-      message = '✅ New habit template applied for ${futureDaysApplied + 1} days starting from today!';
+      message = localizations?.locale.languageCode == 'ko' ? '✅ 오늘부터 ${futureDaysApplied + 1}일간 새로운 습관 템플릿이 적용되었습니다!' :
+                localizations?.locale.languageCode == 'ja' ? '✅ 今日から${futureDaysApplied + 1}日間、新しい習慣テンプレートが適用されました！' : '✅ New habit template applied for ${futureDaysApplied + 1} days starting from today!';
     } else if (todaySkipped && futureDaysApplied > 0) {
-      message = '✅ Today skipped, new habit template applied for ${futureDaysApplied} days starting tomorrow!';
+      message = localizations?.locale.languageCode == 'ko' ? '✅ 오늘은 건너뛰고 내일부터 ${futureDaysApplied}일간 새로운 습관 템플릿이 적용되었습니다!' :
+                localizations?.locale.languageCode == 'ja' ? '✅ 今日はスキップして明日から${futureDaysApplied}日間、新しい習慣テンプレートが適用されました！' : '✅ Today skipped, new habit template applied for ${futureDaysApplied} days starting tomorrow!';
     } else if (todayApplied && futureDaysApplied == 0) {
-      message = '✅ New habit template applied for today only!';
+      message = localizations?.locale.languageCode == 'ko' ? '✅ 오늘에만 새로운 습관 템플릿이 적용되었습니다!' :
+                localizations?.locale.languageCode == 'ja' ? '✅ 今日のみ新しい習慣テンプレートが適用されました！' : '✅ New habit template applied for today only!';
     } else {
-      message = 'There was a problem applying the template.';
+      message = localizations?.locale.languageCode == 'ko' ? '템플릿 적용에 문제가 발생했습니다.' :
+                localizations?.locale.languageCode == 'ja' ? 'テンプレート適用に問題が発生しました。' : 'There was a problem applying the template.';
     }
     
     _showSnackBar(message);
@@ -231,6 +254,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
       );
     }
 
+    final localizations = AppLocalizations.of(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
@@ -252,9 +277,10 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    const Text(
-                      'Habit Templates',
-                      style: TextStyle(
+                    Text(
+                      localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
+                      localizations?.locale.languageCode == 'ja' ? '習慣テンプレート' : 'Habit Templates',
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -262,7 +288,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Create and manage your daily habit templates',
+                      localizations?.locale.languageCode == 'ko' ? '매일 반복할 습관들을 설정하세요' :
+                      localizations?.locale.languageCode == 'ja' ? '毎日繰り返す習慣を設定しましょう' : 'Create and manage your daily habit templates',
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white.withOpacity(0.9),
@@ -294,8 +321,9 @@ class _TemplateScreenState extends State<TemplateScreen> {
                         Expanded(
                           child: TextField(
                             controller: _textController,
-                            decoration: const InputDecoration(
-                              hintText: 'Enter new habit',
+                            decoration: InputDecoration(
+                              hintText: localizations?.locale.languageCode == 'ko' ? '새로운 습관 추가' :
+                                       localizations?.locale.languageCode == 'ja' ? '新しい習慣を追加' : 'Enter new habit',
                               border: InputBorder.none,
                             ),
                             onSubmitted: (_) => _addHabit(),
@@ -304,7 +332,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                         const SizedBox(width: 12),
                         ElevatedButton(
                           onPressed: _addHabit,
-                          child: const Text('Add'),
+                          child: Text(localizations?.locale.languageCode == 'ko' ? '추가' :
+                                     localizations?.locale.languageCode == 'ja' ? '追加' : 'Add'),
                         ),
                       ],
                     ),
@@ -312,7 +341,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                     Row(
                       children: [
                         Text(
-                          '${_templateItems.length}/30 habits',
+                          localizations?.locale.languageCode == 'ko' ? '${_templateItems.length}/30개' :
+                          localizations?.locale.languageCode == 'ja' ? '${_templateItems.length}/30個' : '${_templateItems.length}/30 habits',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade600,
@@ -328,7 +358,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Drag to reorder',
+                            localizations?.locale.languageCode == 'ko' ? '드래그하여 순서 변경' :
+                            localizations?.locale.languageCode == 'ja' ? 'ドラッグして順序変更' : 'Drag to reorder',
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey.shade600,
@@ -373,7 +404,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'No habits in template',
+                                    localizations?.locale.languageCode == 'ko' ? '템플릿에 습관을 추가해보세요!' :
+                                    localizations?.locale.languageCode == 'ja' ? 'テンプレートに習慣を追加してみましょう！' : 'No habits in template',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.grey.shade600,
@@ -383,7 +415,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Add your first habit above',
+                                    localizations?.locale.languageCode == 'ko' ? '매일 반복할 루틴을 만들어보세요' :
+                                    localizations?.locale.languageCode == 'ja' ? '毎日繰り返すルーチンを作ってみましょう' : 'Add your first habit above',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
@@ -514,7 +547,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 child: ElevatedButton.icon(
                   onPressed: _applyTemplateFromToday,
                   icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Apply Habit Template from Today'),
+                  label: Text(localizations?.locale.languageCode == 'ko' ? '오늘부터 습관 템플릿 적용하기' :
+                              localizations?.locale.languageCode == 'ja' ? '今日から習慣テンプレートを適用' : 'Apply Habit Template from Today'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.white.withOpacity(0.9),

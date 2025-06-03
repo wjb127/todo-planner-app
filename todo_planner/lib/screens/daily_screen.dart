@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/todo_item.dart';
 import '../services/storage_service.dart';
+import '../l10n/app_localizations.dart';
 
 class DailyScreen extends StatefulWidget {
   const DailyScreen({super.key});
@@ -111,6 +112,39 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
     }
   }
 
+  String _getDateDisplayText(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selected = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    
+    if (selected == today) {
+      return localizations?.locale.languageCode == 'ko' ? '오늘' :
+             localizations?.locale.languageCode == 'ja' ? '今日' : 'Today';
+    } else if (selected == today.subtract(const Duration(days: 1))) {
+      return localizations?.locale.languageCode == 'ko' ? '어제' :
+             localizations?.locale.languageCode == 'ja' ? '昨日' : 'Yesterday';
+    } else if (selected == today.add(const Duration(days: 1))) {
+      return localizations?.locale.languageCode == 'ko' ? '내일' :
+             localizations?.locale.languageCode == 'ja' ? '明日' : 'Tomorrow';
+    } else {
+      List<String> weekdays;
+      if (localizations?.locale.languageCode == 'ko') {
+        weekdays = ['월', '화', '수', '목', '금', '토', '일'];
+        final weekday = weekdays[_selectedDate.weekday - 1];
+        return '${_selectedDate.month}월 ${_selectedDate.day}일 ($weekday)';
+      } else if (localizations?.locale.languageCode == 'ja') {
+        weekdays = ['月', '火', '水', '木', '金', '土', '日'];
+        final weekday = weekdays[_selectedDate.weekday - 1];
+        return '${_selectedDate.month}月${_selectedDate.day}日 ($weekday)';
+      } else {
+        weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        final weekday = weekdays[_selectedDate.weekday - 1];
+        return '${_selectedDate.month}/${_selectedDate.day} ($weekday)';
+      }
+    }
+  }
+
   String _getFullDateText() {
     return _formatDate(_selectedDate);
   }
@@ -135,6 +169,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final localizations = AppLocalizations.of(context);
+    
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -159,9 +195,10 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Daily Habit Check',
-                            style: TextStyle(
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '일일 습관 체크' :
+                            localizations?.locale.languageCode == 'ja' ? '日次習慣チェック' : 'Daily Habit Check',
+                            style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -169,7 +206,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Check and track your daily habits',
+                            localizations?.locale.languageCode == 'ko' ? '오늘의 습관을 확인하고 체크하세요' :
+                            localizations?.locale.languageCode == 'ja' ? '今日の習慣を確認してチェックしましょう' : 'Check and track your daily habits',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
@@ -186,7 +224,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                       child: IconButton(
                         onPressed: _loadDailyData,
                         icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                        tooltip: 'Refresh',
+                        tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
+                                localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                       ),
                     ),
                   ],
@@ -244,7 +283,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _getDateDisplayText(),
+                                    _getDateDisplayText(context),
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
@@ -283,7 +322,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Completed: ${_getCompletedCount()}/${_dailyTodos.length}',
+                                      localizations?.locale.languageCode == 'ko' ? '완료: ${_getCompletedCount()}/${_dailyTodos.length}' :
+                                      localizations?.locale.languageCode == 'ja' ? '完了: ${_getCompletedCount()}/${_dailyTodos.length}' : 'Completed: ${_getCompletedCount()}/${_dailyTodos.length}',
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
@@ -367,7 +407,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'No tasks for this date',
+                                    localizations?.locale.languageCode == 'ko' ? '이 날짜에는 할 일이 없습니다' :
+                                    localizations?.locale.languageCode == 'ja' ? 'この日付にはタスクがありません' : 'No tasks for this date',
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: Colors.grey.shade600,
@@ -377,7 +418,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Set up templates and tap refresh',
+                                    localizations?.locale.languageCode == 'ko' ? '템플릿을 설정하고 새로고침을 눌러주세요' :
+                                    localizations?.locale.languageCode == 'ja' ? 'テンプレートを設定してリフレッシュを押してください' : 'Set up templates and tap refresh',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey.shade500,
@@ -388,7 +430,8 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   ElevatedButton.icon(
                                     onPressed: _loadDailyData,
                                     icon: const Icon(Icons.refresh_rounded),
-                                    label: const Text('Refresh'),
+                                    label: Text(localizations?.locale.languageCode == 'ko' ? '새로고침' :
+                                               localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Theme.of(context).colorScheme.primary,
                                       foregroundColor: Colors.white,

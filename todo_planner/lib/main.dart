@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en', 'US'), // 영어로 강제 설정
       
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -225,18 +224,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               _currentIndex = index;
             });
           },
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.view_list_rounded),
-              label: 'Templates',
+              icon: const Icon(Icons.view_list_rounded),
+              label: localizations?.templatesTab ?? 'Templates',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.today_rounded),
-              label: 'Daily',
+              icon: const Icon(Icons.today_rounded),
+              label: localizations?.dailyTab ?? 'Daily',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.analytics_rounded),
-              label: 'Statistics',
+              icon: const Icon(Icons.analytics_rounded),
+              label: localizations?.statisticsTab ?? 'Statistics',
             ),
           ],
         ),

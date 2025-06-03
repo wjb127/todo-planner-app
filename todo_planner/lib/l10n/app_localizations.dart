@@ -168,6 +168,16 @@ class AppLocalizations {
   
   String get notificationEnabled => locale.languageCode == 'ko' ? '알림이 활성화되었습니다. 매일 8시, 13시, 18시에 다양한 동기부여 메시지를 받아보세요!' : 
                                   locale.languageCode == 'ja' ? '通知が有効になりました。毎日8時、13時、18時に様々なモチベーションメッセージを受け取りましょう！' : 'Notifications are enabled. Receive various motivational messages at 8AM, 1PM, and 6PM every day!';
+
+  // 하단 네비게이션 탭 텍스트들
+  String get templatesTab => locale.languageCode == 'ko' ? '템플릿' : 
+                           locale.languageCode == 'ja' ? 'テンプレート' : 'Templates';
+  
+  String get dailyTab => locale.languageCode == 'ko' ? '일일' : 
+                       locale.languageCode == 'ja' ? '日次' : 'Daily';
+  
+  String get statisticsTab => locale.languageCode == 'ko' ? '통계' : 
+                            locale.languageCode == 'ja' ? '統計' : 'Statistics';
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

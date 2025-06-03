@@ -4,6 +4,7 @@ import '../models/todo_item.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
 import '../services/purchase_service.dart';
+import '../l10n/app_localizations.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({super.key});
@@ -166,6 +167,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     super.build(context); // AutomaticKeepAliveClientMixin 필수
+    final localizations = AppLocalizations.of(context);
+    
     if (_isLoading) {
       return Scaffold(
         body: Container(
@@ -211,9 +214,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Statistics',
-                              style: TextStyle(
+                            Text(
+                              localizations?.locale.languageCode == 'ko' ? '통계' :
+                              localizations?.locale.languageCode == 'ja' ? '統計' : 'Statistics',
+                              style: const TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -221,7 +225,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Check your habit completion rates and progress',
+                              localizations?.locale.languageCode == 'ko' ? '습관 완료율과 진행 상황을 확인하세요' :
+                              localizations?.locale.languageCode == 'ja' ? '習慣完了率と進行状況を確認しましょう' : 'Check your habit completion rates and progress',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white.withOpacity(0.9),
@@ -238,7 +243,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         child: IconButton(
                           onPressed: _loadStatistics,
                           icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                          tooltip: 'Refresh',
+                          tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
+                                  localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                         ),
                       ),
                     ],
@@ -256,7 +262,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Set up templates and tap refresh',
+                          localizations?.locale.languageCode == 'ko' ? '템플릿을 설정하고 새로고침을 눌러주세요' :
+                          localizations?.locale.languageCode == 'ja' ? 'テンプレートを設定してリフレッシュを押してください' : 'Set up templates and tap refresh',
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.white.withOpacity(0.9),
@@ -268,7 +275,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                         ElevatedButton.icon(
                           onPressed: _loadStatistics,
                           icon: const Icon(Icons.refresh_rounded),
-                          label: const Text('Refresh'),
+                          label: Text(localizations?.locale.languageCode == 'ko' ? '새로고침' :
+                                     localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white.withOpacity(0.9),
                             foregroundColor: Theme.of(context).colorScheme.primary,
@@ -317,9 +325,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Statistics',
-                            style: TextStyle(
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '통계' :
+                            localizations?.locale.languageCode == 'ja' ? '統計' : 'Statistics',
+                            style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -327,7 +336,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Check your habit completion rates and progress',
+                            localizations?.locale.languageCode == 'ko' ? '습관 완료율과 진행 상황을 확인하세요' :
+                            localizations?.locale.languageCode == 'ja' ? '習慣完了率と進行状況を確認しましょう' : 'Check your habit completion rates and progress',
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.9),
@@ -344,7 +354,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                       child: IconButton(
                         onPressed: _loadStatistics,
                         icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                        tooltip: 'Refresh',
+                        tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
+                                localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                       ),
                     ),
                   ],
@@ -391,9 +402,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  const Text(
-                                    'Daily Completion Trend',
-                                    style: TextStyle(
+                                  Text(
+                                    localizations?.locale.languageCode == 'ko' ? '일별 완료율 추이' :
+                                    localizations?.locale.languageCode == 'ja' ? '日別完了率推移' : 'Daily Completion Trend',
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -518,9 +530,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
-                                  'Habit Completion Rates',
-                                  style: TextStyle(
+                                Text(
+                                  localizations?.locale.languageCode == 'ko' ? '습관별 완료율' :
+                                  localizations?.locale.languageCode == 'ja' ? '習慣別完了率' : 'Habit Completion Rates',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -534,7 +547,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                 child: Padding(
                                   padding: const EdgeInsets.all(20),
                                   child: Text(
-                                    'No statistics data found.',
+                                    localizations?.locale.languageCode == 'ko' ? '통계 데이터가 없습니다.' :
+                                    localizations?.locale.languageCode == 'ja' ? '統計データが見つかりません。' : 'No statistics data found.',
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 16,
@@ -644,9 +658,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                   ),
                                 ),
                                 const SizedBox(width: 12),
-                                const Text(
-                                  'Summary',
-                                  style: TextStyle(
+                                Text(
+                                  localizations?.locale.languageCode == 'ko' ? '요약' :
+                                  localizations?.locale.languageCode == 'ja' ? '要約' : 'Summary',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -654,14 +669,41 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                               ],
                             ),
                             const SizedBox(height: 16),
-                            _buildSummaryRow('Analysis Period', 'Last 30 days (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "None"} ~ ${_formatDate(DateTime.now())})'),
-                            _buildSummaryRow('Total Analysis Days', '${_statisticsData.length} days'),
-                            _buildSummaryRow('Template Items', '${_template.length} habits'),
+                            _buildSummaryRow(
+                              localizations?.locale.languageCode == 'ko' ? '분석 기간' :
+                              localizations?.locale.languageCode == 'ja' ? '分析期間' : 'Analysis Period',
+                              localizations?.locale.languageCode == 'ko' ? '최근 30일 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "없음"} ~ ${_formatDate(DateTime.now())})' :
+                              localizations?.locale.languageCode == 'ja' ? '最近30日 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "なし"} ~ ${_formatDate(DateTime.now())})' : 'Last 30 days (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "None"} ~ ${_formatDate(DateTime.now())})'
+                            ),
+                            _buildSummaryRow(
+                              localizations?.locale.languageCode == 'ko' ? '총 분석 일수' :
+                              localizations?.locale.languageCode == 'ja' ? '総分析日数' : 'Total Analysis Days',
+                              localizations?.locale.languageCode == 'ko' ? '${_statisticsData.length}일' :
+                              localizations?.locale.languageCode == 'ja' ? '${_statisticsData.length}日' : '${_statisticsData.length} days'
+                            ),
+                            _buildSummaryRow(
+                              localizations?.locale.languageCode == 'ko' ? '템플릿 항목 수' :
+                              localizations?.locale.languageCode == 'ja' ? 'テンプレート項目数' : 'Template Items',
+                              localizations?.locale.languageCode == 'ko' ? '${_template.length}개' :
+                              localizations?.locale.languageCode == 'ja' ? '${_template.length}個' : '${_template.length} habits'
+                            ),
                             if (completionRates.isNotEmpty) ...[
                               const SizedBox(height: 8),
-                              _buildSummaryRow('Average Completion Rate', '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'),
-                              _buildSummaryRow('Highest Completion Rate', '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'),
-                              _buildSummaryRow('Lowest Completion Rate', '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'),
+                              _buildSummaryRow(
+                                localizations?.locale.languageCode == 'ko' ? '평균 완료율' :
+                                localizations?.locale.languageCode == 'ja' ? '平均完了率' : 'Average Completion Rate',
+                                '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'
+                              ),
+                              _buildSummaryRow(
+                                localizations?.locale.languageCode == 'ko' ? '최고 완료율' :
+                                localizations?.locale.languageCode == 'ja' ? '最高完了率' : 'Highest Completion Rate',
+                                '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'
+                              ),
+                              _buildSummaryRow(
+                                localizations?.locale.languageCode == 'ko' ? '최저 완료율' :
+                                localizations?.locale.languageCode == 'ja' ? '最低完了率' : 'Lowest Completion Rate',
+                                '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'
+                              ),
                               const SizedBox(height: 12),
                               Container(
                                 width: double.infinity,
@@ -688,7 +730,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      'Title',
+                                      localizations?.locale.languageCode == 'ko' ? '칭호' :
+                                      localizations?.locale.languageCode == 'ja' ? '称号' : 'Title',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.grey.shade600,
