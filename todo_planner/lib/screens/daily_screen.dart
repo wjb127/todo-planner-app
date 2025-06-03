@@ -94,24 +94,6 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
     }
   }
 
-  String _getDateDisplayText() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final selected = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-    
-    if (selected == today) {
-      return 'Today';
-    } else if (selected == today.subtract(const Duration(days: 1))) {
-      return 'Yesterday';
-    } else if (selected == today.add(const Duration(days: 1))) {
-      return 'Tomorrow';
-    } else {
-      final weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      final weekday = weekdays[_selectedDate.weekday - 1];
-      return '${_selectedDate.month}/${_selectedDate.day} ($weekday)';
-    }
-  }
-
   String _getDateDisplayText(BuildContext context) {
     final localizations = AppLocalizations.of(context);
     final now = DateTime.now();
