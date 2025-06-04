@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 class AdService {
   static const String _adRemovedKey = 'ad_removed';
@@ -14,7 +15,7 @@ class AdService {
     if (Platform.isAndroid) {
       return 'ca-app-pub-2803803669720807/1723563018'; // Android 전면광고 ID
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-2803803669720807/8956329685'; // iOS 전면광고 ID (별도 생성 필요)
+      return 'ca-app-pub-2803803669720807/2186381844'; // iOS 전면광고 ID
     }
     throw UnsupportedError('Unsupported platform');
   }
@@ -33,10 +34,32 @@ class AdService {
 
   // 애드몹 초기화
   static Future<void> initialize() async {
+    // iOS에서 App Tracking Transparency 권한 요청
+    if (Platform.isIOS) {
+      await _requestTrackingPermission();
+    }
+    
     await MobileAds.instance.initialize();
     _isTestMode = await getTestMode();
     _loadInterstitialAd();
     print('🔥 AdService initialized - Test mode: $_isTestMode');
+  }
+
+  // App Tracking Transparency 권한 요청 (iOS 전용)
+  static Future<void> _requestTrackingPermission() async {
+    try {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      print('📱 현재 추적 권한 상태: $status');
+      
+      // 아직 권한을 요청하지 않았다면 요청
+      if (status == TrackingStatus.notDetermined) {
+        print('🔔 추적 권한 요청 중...');
+        final result = await AppTrackingTransparency.requestTrackingAuthorization();
+        print('✅ 추적 권한 요청 결과: $result');
+      }
+    } catch (e) {
+      print('❌ 추적 권한 요청 실패: $e');
+    }
   }
 
   // 전면 광고 로드

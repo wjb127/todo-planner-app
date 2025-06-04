@@ -1,0 +1,9 @@
+# app-ads.txt for 습관메이커 (Habit Maker)
+# This file is used to authorize digital advertising sellers
+# More info: https://iabtechlab.com/app-ads-txt/
+
+# Google AdMob
+google.com, pub-2803803669720807, DIRECT, f08c47fec0942fa0
+
+# Additional authorized sellers can be added here
+# Format: domain, publisher_id, relationship, certification_authority_id 

@@ -24,6 +24,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -34,13 +38,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -48,7 +45,7 @@
 	
 	<!-- 애드몹 앱 ID -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-2803803669720807~5918793042</string>
+	<string>ca-app-pub-2803803669720807~6190633085</string>
 	
 	<!-- 앱 추적 투명성 -->
 	<key>NSUserTrackingUsageDescription</key>
@@ -57,6 +54,10 @@
 	<!-- 알림 권한 -->
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>습관 알림을 받기 위해 알림 권한이 필요합니다.</string>
+	
+	<!-- 암호화 사용 여부 (Export Compliance) -->
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	
 	<!-- SKAdNetwork 식별자들 -->
 	<key>SKAdNetworkItems</key>
