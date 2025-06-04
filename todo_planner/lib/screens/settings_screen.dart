@@ -223,59 +223,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: Colors.blue.shade200),
                               ),
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Icon(
-                                    Icons.info_outline_rounded,
-                                    color: Colors.blue.shade600,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      localizations.notificationEnabled,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.blue.shade700,
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle_rounded,
+                                        color: Colors.blue.shade600,
+                                        size: 20,
                                       ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '일일 습관 알림이 활성화되었습니다',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue.shade800,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '📅 알림 시간: 오전 8시, 오후 12시, 오후 6시\n'
+                                    '🎯 목적: 아침(시작), 점심(중간체크), 저녁(마무리) 습관 관리\n'
+                                    '💡 일정한 시간에 반복하면 습관이 더 쉽게 만들어져요',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.blue.shade700,
+                                      height: 1.4,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            // 즉시 테스트 알림 버튼 (출시용에서 숨김)
-                            // const SizedBox(height: 12),
-                            // SizedBox(
-                            //   width: double.infinity,
-                            //   child: ElevatedButton.icon(
-                            //     onPressed: () async {
-                            //       await NotificationService.sendTestNotification();
-                            //       if (mounted) {
-                            //         ScaffoldMessenger.of(context).showSnackBar(
-                            //           SnackBar(
-                            //             content: const Text('테스트 알림을 보냈습니다!'),
-                            //             backgroundColor: Colors.green.shade600,
-                            //             behavior: SnackBarBehavior.floating,
-                            //             shape: RoundedRectangleBorder(
-                            //               borderRadius: BorderRadius.circular(12),
-                            //             ),
-                            //             margin: const EdgeInsets.all(16),
-                            //           ),
-                            //         );
-                            //       }
-                            //     },
-                            //     icon: const Icon(Icons.send_rounded),
-                            //     label: const Text('즉시 테스트 알림'),
-                            //     style: ElevatedButton.styleFrom(
-                            //       backgroundColor: Theme.of(context).colorScheme.primary,
-                            //       foregroundColor: Colors.white,
-                            //       padding: const EdgeInsets.symmetric(vertical: 12),
-                            //       shape: RoundedRectangleBorder(
-                            //         borderRadius: BorderRadius.circular(12),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
                           ],
                         ],
                       ),
@@ -579,6 +561,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _buildHelpItem('2. 템플릿 적용', '"오늘부터 습관 템플릿 적용하기" 버튼을 눌러 적용하세요'),
                           _buildHelpItem('3. 일일 체크', '매일 습관을 체크하고 진행률을 확인하세요'),
                           _buildHelpItem('4. 통계 확인', '완료율과 칭호를 통해 성과를 확인하세요'),
+                          _buildHelpItem('5. 스마트 알림', '오전 8시, 오후 12시, 오후 6시에 하루 3번 알림을 받아보세요'),
                         ],
                       ),
                     ),
