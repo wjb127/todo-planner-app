@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../models/todo_item.dart';
 import '../services/storage_service.dart';
+import '../services/ad_service.dart';
 import '../l10n/app_localizations.dart';
 
 class TemplateScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
   List<TodoItem> _templateItems = [];
   final TextEditingController _textController = TextEditingController();
   bool _isLoading = true;
+  int _addHabitCount = 0; // 습관 추가 횟수 카운터
 
   @override
   void initState() {
@@ -34,7 +36,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
     await StorageService.saveTemplate(_templateItems);
   }
 
-  void _addHabit() {
+  Future<void> _addHabit() async {
     final localizations = AppLocalizations.of(context);
     final text = _textController.text.trim();
     if (text.isNotEmpty) {
@@ -44,11 +46,28 @@ class _TemplateScreenState extends State<TemplateScreen> {
           title: text,
           isCompleted: false,
         ));
+        _addHabitCount++; // 카운터 증가
       });
       _textController.clear();
       _saveTemplate();
       _showSnackBar(localizations?.locale.languageCode == 'ko' ? '습관이 추가되었습니다!' :
                    localizations?.locale.languageCode == 'ja' ? '習慣が追加されました！' : 'Habit added successfully!');
+      
+      // 3번째, 6번째, 9번째... 습관 추가 시 광고 표시
+      if (_addHabitCount % 3 == 0) {
+        print('🎯 습관 추가 ${_addHabitCount}회 - 광고 표시');
+        await _showAdAfterDelay();
+      }
+    }
+  }
+
+  Future<void> _showAdAfterDelay() async {
+    // 1초 후 광고 표시 (사용자 경험을 위해)
+    await Future.delayed(const Duration(seconds: 1));
+    try {
+      await AdService.showInterstitialAd();
+    } catch (e) {
+      print('❌ 습관 추가 후 광고 표시 실패: $e');
     }
   }
 

@@ -6,6 +6,7 @@ import 'screens/template_screen.dart';
 import 'screens/daily_screen.dart';
 import 'screens/statistics_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/ad_service.dart';
 import 'services/purchase_service.dart';
 import 'services/notification_service.dart';
@@ -14,9 +15,6 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Google Mobile Ads 초기화
-  await MobileAds.instance.initialize();
   
   // 알림 서비스 초기화
   await NotificationService.initialize();
@@ -29,9 +27,6 @@ void main() async {
   if (await NotificationService.isNotificationEnabled()) {
     await NotificationService.scheduleDailyNotification();
   }
-  
-  // 광고 서비스 초기화
-  await AdService.initialize();
   
   runApp(const MyApp());
 }
@@ -116,7 +111,7 @@ class MyApp extends StatelessWidget {
           type: BottomNavigationBarType.fixed,
         ),
       ),
-      home: const MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -130,7 +125,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
-  bool _hasShownInitialAd = false;
 
   final List<Widget> _screens = [
     const TemplateScreen(),
@@ -142,11 +136,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
-    // 앱 시작 후 광고 표시
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showInitialAd();
-    });
   }
 
   @override
@@ -160,15 +149,6 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-  }
-
-  Future<void> _showInitialAd() async {
-    if (!_hasShownInitialAd) {
-      print('🚀 앱 시작 - 초기 광고 표시 준비');
-      await Future.delayed(const Duration(seconds: 2)); // 2초 후 광고 표시
-      await AdService.showInterstitialAd();
-      _hasShownInitialAd = true;
-    }
   }
 
   Future<void> _showInterstitialAd() async {
