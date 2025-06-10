@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../services/ad_service.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 
@@ -17,9 +16,8 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   
-  bool _adLoadingComplete = false;
-  bool _minimumTimeComplete = false;
-  String _statusMessage = '';
+  bool _loadingComplete = false;
+  String _statusMessage = 'Loading...';
 
   @override
   void initState() {
@@ -28,18 +26,7 @@ class _SplashScreenState extends State<SplashScreen>
     // 상태바 숨기기
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     
-    // 초기 상태 메시지 설정
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        setState(() {
-          _statusMessage = AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ko' 
-            ? '로딩 중...'
-            : AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ja'
-              ? '読み込み中...'
-              : 'Loading...';
-        });
-      }
-    });
+    // 상태 메시지는 이미 초기화됨
     
     // 애니메이션 초기화
     _animationController = AnimationController(
@@ -71,67 +58,24 @@ class _SplashScreenState extends State<SplashScreen>
     // 애니메이션 시작
     _animationController.forward();
     
-    // 병렬로 실행
-    await Future.wait([
-      _loadAds(),
-      _waitMinimumTime(),
-    ]);
+    // 최소 2초 대기 (사용자 경험을 위해)
+    await Future.delayed(const Duration(seconds: 2));
     
-    // 모든 로딩이 완료되면 메인 화면으로 이동
+    setState(() {
+      _statusMessage = 'Ready!';
+      _loadingComplete = true;
+    });
+    
+    // 메인 화면으로 이동
     _navigateToMain();
   }
 
-  Future<void> _loadAds() async {
-    try {
-      setState(() {
-        _statusMessage = AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ko' 
-          ? '광고 시스템 초기화 중...'
-          : AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ja'
-            ? '広告システム初期化中...'
-            : 'Initializing ad system...';
-      });
-      
-      // 애드몹 초기화
-      await AdService.initialize();
-      
-      setState(() {
-        _statusMessage = AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ko' 
-          ? '완료!'
-          : AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ja'
-            ? '完了！'
-            : 'Complete!';
-        _adLoadingComplete = true;
-      });
-      
-      print('🚀 스플래시: 애드몹 초기화 완료');
-    } catch (e) {
-      print('❌ 스플래시: 애드몹 초기화 실패 - $e');
-      setState(() {
-        _statusMessage = AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ko' 
-          ? '준비 완료!'
-          : AppLocalizations(Localizations.localeOf(context)).locale.languageCode == 'ja'
-            ? '準備完了！'
-            : 'Ready!';
-        _adLoadingComplete = true;
-      });
-    }
-  }
 
-  Future<void> _waitMinimumTime() async {
-    // 최소 2초 대기 (사용자 경험을 위해)
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _minimumTimeComplete = true;
-    });
-  }
 
   void _navigateToMain() async {
-    if (_adLoadingComplete && _minimumTimeComplete) {
+    if (_loadingComplete) {
       // 상태바 복원
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-      
-      // 스플래시 이후 전면광고 표시 시도
-      await _showStartupAd();
       
       // 메인 화면으로 이동
       if (mounted) {
@@ -144,15 +88,6 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  Future<void> _showStartupAd() async {
-    try {
-      print('🎯 스플래시: 시작 광고 표시 시도');
-      await AdService.showInterstitialAd();
-    } catch (e) {
-      print('❌ 스플래시: 시작 광고 표시 실패 - $e');
-    }
-  }
-
   @override
   void dispose() {
     _animationController.dispose();
@@ -161,7 +96,10 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    final localizations = AppLocalizations(Localizations.localeOf(context));
+    // 안전한 방법으로 다국어 처리
+    final localizations = Localizations.maybeLocaleOf(context)?.languageCode == 'ko'
+        ? '습관메이커'
+        : 'Habit Maker';
     
     return Scaffold(
       body: Container(
@@ -217,7 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
                               
                               // 앱 이름
                               Text(
-                                localizations.appTitle,
+                                localizations,
                                 style: const TextStyle(
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
@@ -230,11 +168,9 @@ class _SplashScreenState extends State<SplashScreen>
                               
                               // 슬로건
                               Text(
-                                localizations.locale.languageCode == 'ko' 
+                                Localizations.maybeLocaleOf(context)?.languageCode == 'ko' 
                                   ? '매일 반복하는 작은 변화, 큰 성장의 시작'
-                                  : localizations.locale.languageCode == 'ja'
-                                    ? '毎日の小さな変化が、大きな成長の始まり'
-                                    : 'Small daily changes, the beginning of great growth',
+                                  : 'Small daily changes, the beginning of great growth',
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white.withOpacity(0.9),

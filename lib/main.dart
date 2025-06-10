@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,20 +15,44 @@ import 'services/backup_service.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  // 알림 서비스 초기화
-  await NotificationService.initialize();
-  
-  // 데이터 마이그레이션 및 백업 시스템 초기화
-  await BackupService.migrateData();
-  await BackupService.autoBackup();
-  
-  // 알림이 활성화되어 있다면 다시 스케줄링
-  if (await NotificationService.isNotificationEnabled()) {
-    await NotificationService.scheduleDailyNotification();
+  // 안전한 Flutter 바인딩 초기화 with 오류 처리
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    print('🔍 Flutter 바인딩 초기화 완료');
+  } catch (e) {
+    print('❌ Flutter 바인딩 초기화 실패: $e');
+    // 바인딩 실패 시에도 앱 실행 계속
   }
   
+  // 안전한 서비스 초기화 with 오류 처리
+  try {
+    print('🔔 알림 서비스 초기화 시작');
+    await NotificationService.initialize();
+    print('🔔 알림 서비스 초기화 완료');
+  } catch (e) {
+    print('❌ 알림 서비스 초기화 실패: $e');
+  }
+  
+  try {
+    print('💾 백업 서비스 초기화 시작');
+    await BackupService.migrateData();
+    await BackupService.autoBackup();
+    print('💾 백업 서비스 초기화 완료');
+  } catch (e) {
+    print('❌ 백업 서비스 초기화 실패: $e');
+  }
+  
+  try {
+    // 알림이 활성화되어 있다면 다시 스케줄링
+    if (await NotificationService.isNotificationEnabled()) {
+      await NotificationService.scheduleDailyNotification();
+      print('🔔 알림 스케줄링 완료');
+    }
+  } catch (e) {
+    print('❌ 알림 스케줄링 실패: $e');
+  }
+  
+  print('🚀 앱 실행 시작');
   runApp(const MyApp());
 }
 
@@ -126,16 +151,23 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const TemplateScreen(),
-    const DailyScreen(),
-    const StatisticsScreen(),
-  ];
+  // 각 페이지의 새로고침을 제어하기 위한 GlobalKey
+  final GlobalKey _dailyKey = GlobalKey();
+  final GlobalKey _statisticsKey = GlobalKey();
+
+  late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    
+    // 화면 리스트 초기화 (GlobalKey 포함)
+    _screens = [
+      const TemplateScreen(),
+      DailyScreen(key: _dailyKey),
+      StatisticsScreen(key: _statisticsKey),
+    ];
   }
 
   @override
@@ -196,8 +228,20 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (index) async {
+            // 같은 탭을 다시 눌렀을 때 새로고침
+            if (_currentIndex == index) {
+              if (index == 1) {
+                // 일일 페이지 새로고침
+                (_dailyKey.currentState as dynamic)?.refresh();
+              } else if (index == 2) {
+                // 통계 페이지 새로고침
+                (_statisticsKey.currentState as dynamic)?.refresh();
+              }
+              return;
+            }
+            
             // 통계 탭으로 이동할 때 광고 표시
-            if (_currentIndex != index && index == 2) {
+            if (index == 2) {
               await _showInterstitialAd();
             }
             setState(() {

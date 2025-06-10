@@ -59,6 +59,19 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	
+	<!-- 백그라운드 실행 권한 -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>background-processing</string>
+		<string>background-fetch</string>
+	</array>
+	
+	<!-- 앱 실행 권한 개선 -->
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	
 	<!-- SKAdNetwork 식별자들 -->
 	<key>SKAdNetworkItems</key>
 	<array>

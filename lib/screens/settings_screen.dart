@@ -246,7 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    '📅 알림 시간: 오전 8시, 오후 12시, 오후 6시\n'
+                                    '📅 알림 시간: 오전 7시, 오후 12시, 오후 6시\n'
                                     '🎯 목적: 아침(시작), 점심(중간체크), 저녁(마무리) 습관 관리\n'
                                     '💡 일정한 시간에 반복하면 습관이 더 쉽게 만들어져요',
                                     style: TextStyle(

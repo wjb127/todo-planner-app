@@ -1,119 +1,105 @@
-# 습관메이커 (Habit Maker) 📱
+# 🎯 습관메이커 (Habit Maker)
 
-매일 반복하는 습관을 만들고 관리하는 스마트한 앱
+매일 반복하는 습관을 만들고 관리하는 Flutter 앱입니다.
 
-## 🌟 주요 기능
+## ✨ 주요 기능
 
-### 📋 반복 습관 템플릿
-- 최대 30개의 습관을 템플릿으로 설정
-- 카테고리별 습관 관리 (건강, 학습, 생활 등)
-- 간편한 템플릿 적용 시스템
+- 📝 **습관 템플릿**: 최대 30개의 일일 습관 설정
+- ✅ **일일 체크**: 간편한 체크리스트로 습관 관리
+- 📊 **통계 및 분석**: 완료율과 성취 칭호 시스템
+- 🔔 **스마트 알림**: 하루 3회 자동 알림 (8시, 13시, 18시)
+- 💾 **자동 백업**: 안전한 데이터 보호
+- 🌍 **다국어 지원**: 한국어, 영어, 일본어
 
-### ✅ 일일 체크
-- 직관적인 체크박스 인터페이스
-- 실시간 진행률 확인
-- 완료된 습관 시각적 표시
+## 🚀 시작하기
 
-### 📊 통계 및 분석
-- 일별/주별/월별 완료율 차트
-- 습관별 성과 분석
-- 성취도에 따른 칭호 시스템
+### 필수 요구사항
 
-### 🔔 스마트 알림
-- 매일 8시, 13시, 18시 알림
-- 시간대 자동 감지 (한국/일본/미국 등)
-- 다국어 동기부여 메시지
+- Flutter SDK 3.0+
+- Dart 3.0+
+- Android Studio / VS Code
+- Android SDK (API 21+)
 
-### 💾 데이터 관리
-- 자동 백업 시스템
-- 데이터 복원 기능
-- 로컬 저장으로 개인정보 보호
+### 설치 및 실행
 
-## 🌍 다국어 지원
-
-- 🇰🇷 한국어
-- 🇯🇵 일본어  
-- 🇺🇸 영어
-
-## 📱 지원 플랫폼
-
-- Android 5.0 (API 21) 이상
-- iOS 12.0 이상 (향후 지원 예정)
-
-## 🛡️ 개인정보 보호
-
-- 모든 습관 데이터는 기기에만 저장
-- 서버에 개인정보 전송하지 않음
-- 투명한 개인정보 처리방침
-
-## 📄 문서
-
-- [개인정보 처리방침](privacy-policy.md)
-- [이용약관](terms-of-service.md)
-
-## 🚀 출시 정보
-
-- **버전**: 1.0.0
-- **출시일**: 2025년 6월
-- **개발자**: Habit Maker Team
-
-## 📞 문의
-
-- **이메일**: wjb127@naver.com
-- **GitHub**: [habit-maker](https://github.com/seungbeenwi/habit-maker)
-
-## 📸 스크린샷
-
-### 메인 화면
-- 반복 습관 템플릿 관리
-- 일일 체크 화면
-- 통계 및 분석
-
-### 설정 화면
-- 알림 설정
-- 데이터 백업/복원
-- 앱 정보
-
-## 🔧 기술 스택
-
-- **Framework**: Flutter 3.16+
-- **Language**: Dart
-- **Database**: SharedPreferences (로컬 저장)
-- **Notifications**: flutter_local_notifications
-- **Charts**: fl_chart
-- **Ads**: Google Mobile Ads
-
-## 📦 설치 방법
-
-### Google Play Store
-곧 출시 예정! 🎉
-
-### 개발자용 빌드
+1. **저장소 클론**
 ```bash
-# 저장소 클론
-git clone https://github.com/seungbeenwi/habit-maker.git
-cd habit-maker/todo_planner
+git clone https://github.com/YOUR_USERNAME/todo-planner-app.git
+cd todo-planner-app/todo_planner
+```
 
-# 의존성 설치
+2. **의존성 설치**
+```bash
 flutter pub get
+```
 
-# 앱 실행
+3. **앱 실행**
+```bash
 flutter run
 ```
 
-## 🏗️ 빌드 방법
+## 🔐 출시용 빌드 설정
 
-### Android AAB 생성
+### 1. 키스토어 설정
+
+출시용 APK/AAB를 빌드하려면 키스토어 설정이 필요합니다:
+
 ```bash
-cd todo_planner
-flutter build appbundle --release
+# 1. 키스토어 설정 파일 생성
+cp android/key.properties.template android/key.properties
+
+# 2. key.properties 파일 편집
+# 실제 키스토어 정보로 수정하세요
 ```
 
-### APK 생성
+### 2. 키스토어 파일 생성
+
 ```bash
-cd todo_planner
+# 새 키스토어 생성 (한 번만 실행)
+keytool -genkey -v -keystore android/habit-maker-key.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 \
+  -alias habit-maker
+```
+
+### 3. 출시용 빌드
+
+```bash
+# AAB 파일 생성 (구글 플레이 스토어용)
+flutter build appbundle --release
+
+# APK 파일 생성 (직접 배포용)
 flutter build apk --release
 ```
+
+## 📱 앱 구조
+
+```
+lib/
+├── main.dart                 # 앱 진입점
+├── models/                   # 데이터 모델
+├── screens/                  # 화면 위젯
+├── services/                 # 비즈니스 로직
+│   ├── ad_service.dart      # 광고 관리
+│   ├── notification_service.dart # 알림 관리
+│   ├── backup_service.dart  # 백업/복원
+│   └── storage_service.dart # 데이터 저장
+├── l10n/                    # 다국어 지원
+└── widgets/                 # 공통 위젯
+```
+
+## 🔒 보안 주의사항
+
+⚠️ **중요**: 다음 파일들은 절대 GitHub에 업로드하지 마세요!
+
+- `android/key.properties` - 키스토어 설정
+- `*.jks`, `*.keystore` - 키스토어 파일
+- `android/app/google-services.json` - Firebase 설정
+
+이 파일들은 `.gitignore`에 포함되어 있습니다.
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다.
 
 ## 🤝 기여하기
 
@@ -123,16 +109,11 @@ flutter build apk --release
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 라이선스
+## 📞 연락처
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
-
-## 🙏 감사의 말
-
-- Flutter 팀의 훌륭한 프레임워크
-- 오픈소스 커뮤니티의 지원
-- 베타 테스터들의 소중한 피드백
+- 이메일: wjb127@naver.com
+- 개인정보 처리방침: [Privacy Policy](https://wjb127.github.io/todo-planner-app/privacy-policy)
 
 ---
 
-**습관메이커와 함께 더 나은 내일을 만들어보세요! 🌱** 
+**Made with ❤️ by Habit Maker Team**

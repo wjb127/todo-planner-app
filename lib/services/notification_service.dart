@@ -191,8 +191,8 @@ class NotificationService {
     await _notifications.cancelAll();
     debugPrint('Cancelled all existing notifications');
     
-    // 8시 알림 스케줄링 (아침 - 하루 시작)
-    await _scheduleNotificationAt(8, 0, 0, 'morning');
+    // 7시 알림 스케줄링 (아침 - 하루 시작)
+    await _scheduleNotificationAt(7, 0, 0, 'morning');
     
     // 12시 알림 스케줄링 (점심 - 중간 체크)
     await _scheduleNotificationAt(12, 0, 1, 'afternoon');
@@ -202,7 +202,7 @@ class NotificationService {
     
     // 설정 저장
     await setNotificationEnabled(true);
-    debugPrint('Daily notifications scheduled successfully (8:00 AM, 12:00 PM, 6:00 PM)');
+    debugPrint('Daily notifications scheduled successfully (7:00 AM, 12:00 PM, 6:00 PM)');
   }
 
   static Future<void> _scheduleNotificationAt(int hour, int minute, int notificationId, String timeOfDay) async {
@@ -340,7 +340,7 @@ class NotificationService {
   }
 
   static Future<void> cancelDailyNotification() async {
-    await _notifications.cancel(0); // 8시 알림 취소
+    await _notifications.cancel(0); // 7시 알림 취소
     await _notifications.cancel(1); // 12시 알림 취소
     await _notifications.cancel(2); // 18시 알림 취소
     await setNotificationEnabled(false);

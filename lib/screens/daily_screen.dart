@@ -11,6 +11,11 @@ class DailyScreen extends StatefulWidget {
 }
 
 class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClientMixin {
+  
+  // 외부에서 새로고침을 호출할 수 있는 공개 메서드
+  void refresh() {
+    _loadDailyData();
+  }
   DateTime _selectedDate = DateTime.now();
   List<TodoItem> _dailyTodos = [];
   bool _isLoading = true;
@@ -200,12 +205,19 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
                       ),
                       child: IconButton(
                         onPressed: _loadDailyData,
-                        icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                        icon: Icon(
+                          Icons.refresh_rounded, 
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
                                 localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                       ),

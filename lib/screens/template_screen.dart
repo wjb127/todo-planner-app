@@ -245,6 +245,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 1), // 1초로 변경
         ),
       );
     }
@@ -294,24 +295,31 @@ class _TemplateScreenState extends State<TemplateScreen> {
               // Header
               Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Column(
+                child: Row(
                   children: [
-                    Text(
-                      localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
-                      localizations?.locale.languageCode == 'ja' ? '習慣テンプレート' : 'Habit Templates',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      localizations?.locale.languageCode == 'ko' ? '매일 반복할 습관들을 설정하세요' :
-                      localizations?.locale.languageCode == 'ja' ? '毎日繰り返す習慣を設定しましょう' : 'Create and manage your daily habit templates',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
+                            localizations?.locale.languageCode == 'ja' ? '習慣テンプレート' : 'Habit Templates',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '매일 반복할 습관들을 설정하세요' :
+                            localizations?.locale.languageCode == 'ja' ? '毎日繰り返す習慣을 설정하세요' : 'Create and manage your daily habit templates',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

@@ -17,6 +17,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
   List<TodoItem> _template = [];
   Map<String, Map<String, bool>> _statisticsData = {};
   bool _isLoading = true;
+  
+  // 외부에서 새로고침을 호출할 수 있는 공개 메서드
+  void refresh() {
+    _loadStatistics();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -226,25 +231,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                             const SizedBox(height: 8),
                             Text(
                               localizations?.locale.languageCode == 'ko' ? '습관 완료율과 진행 상황을 확인하세요' :
-                              localizations?.locale.languageCode == 'ja' ? '習慣完了率と進行状況を確認しましょう' : 'Check your habit completion rates and progress',
+                              localizations?.locale.languageCode == 'ja' ? '習慣完了率と進行状況を 확인하세요' : 'Check your habit completion rates and progress',
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.white.withOpacity(0.9),
                               ),
                             ),
                           ],
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          onPressed: _loadStatistics,
-                          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                          tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
-                                  localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                         ),
                       ),
                     ],
@@ -348,12 +341,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
                       ),
                       child: IconButton(
                         onPressed: _loadStatistics,
-                        icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                        icon: Icon(
+                          Icons.refresh_rounded, 
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
                         tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
                                 localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
                       ),
