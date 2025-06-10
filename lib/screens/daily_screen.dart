@@ -229,7 +229,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
               // Date Selection & Progress
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -243,64 +243,125 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                 ),
                 child: Column(
                   children: [
-                    // Date Selector
-                    InkWell(
-                      onTap: _selectDate,
-                      borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                Icons.calendar_today_rounded,
-                                color: Theme.of(context).colorScheme.primary,
-                                size: 20,
-                              ),
+                    // Date Selector with navigation buttons
+                    Row(
+                      children: [
+                        // Previous day button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
                             ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = _selectedDate.subtract(const Duration(days: 1));
+                              });
+                              _loadDailyData();
+                            },
+                            icon: Icon(
+                              Icons.chevron_left_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 18,
+                            ),
+                            tooltip: localizations?.locale.languageCode == 'ko' ? '이전 날' :
+                                    localizations?.locale.languageCode == 'ja' ? '前日' : 'Previous day',
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        
+                        // Date display (clickable)
+                        Expanded(
+                          child: InkWell(
+                            onTap: _selectDate,
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    _getDateDisplayText(context),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
+                                  Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.calendar_today_rounded,
+                                      color: Theme.of(context).colorScheme.primary,
+                                      size: 18,
                                     ),
                                   ),
-                                  Text(
-                                    _getFullDateText(),
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey.shade600,
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _getDateDisplayText(context),
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          _getFullDateText(),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                      ],
                                     ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios_rounded,
+                                    color: Colors.grey.shade400,
+                                    size: 16,
                                   ),
                                 ],
                               ),
                             ),
-                            Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.grey.shade400,
-                              size: 16,
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        
+                        const SizedBox(width: 12),
+                        // Next day button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            ),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedDate = _selectedDate.add(const Duration(days: 1));
+                              });
+                              _loadDailyData();
+                            },
+                            icon: Icon(
+                              Icons.chevron_right_rounded,
+                              color: Theme.of(context).colorScheme.primary,
+                              size: 18,
+                            ),
+                            tooltip: localizations?.locale.languageCode == 'ko' ? '다음 날' :
+                                    localizations?.locale.languageCode == 'ja' ? '翌日' : 'Next day',
+                          ),
+                        ),
+                      ],
                     ),
                     
                     // Progress Section

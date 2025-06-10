@@ -277,7 +277,7 @@ class NotificationService {
     
     try {
       await _notifications.zonedSchedule(
-        notificationId, // 알림 ID (8시: 0, 12시: 1, 18시: 2)
+        notificationId, // 알림 ID (7시: 0, 12시: 1, 18시: 2)
         title, // 제목
         message, // 내용
         scheduledTime, // 지정된 시간

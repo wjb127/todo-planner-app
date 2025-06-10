@@ -79,14 +79,14 @@ class AppLocalizations {
           '🌅 좋은 아침! 오늘의 습관을 시작해보세요',
           '☀️ 새로운 하루가 시작됐어요. 습관 체크!',
           '🌞 아침 습관으로 하루를 활기차게 시작하세요',
-          '⭐ 아침 8시, 습관 메이커 시간입니다!',
+          '⭐ 아침 7시, 습관 메이커 시간입니다!',
         ];
       case 'ja':
         return [
           '🌅 おはようございます！今日の習慣を始めましょう',
           '☀️ 新しい一日が始まりました。習慣チェック！',
           '🌞 朝の習慣で一日を活気よく始めましょう',
-          '⭐ 朝8時、ハビットメーカータイムです！',
+          '⭐ 朝7時、ハビットメーカータイムです！',
         ];
       case 'en':
       default:
@@ -94,7 +94,7 @@ class AppLocalizations {
           '🌅 Good morning! Let\'s start today\'s habits',
           '☀️ A new day has begun. Habit check!',
           '🌞 Start your day energetically with morning habits',
-          '⭐ 8 AM, it\'s Habit Maker time!',
+          '⭐ 7 AM, it\'s Habit Maker time!',
         ];
     }
   }
@@ -160,14 +160,14 @@ class AppLocalizations {
   String get notificationSettings => locale.languageCode == 'ko' ? '알림 설정' : 
                                    locale.languageCode == 'ja' ? '通知設定' : 'Notification Settings';
   
-  String get dailyHabitReminder => locale.languageCode == 'ko' ? '매일 습관 알림 (8시, 13시, 18시)' : 
-                                 locale.languageCode == 'ja' ? '毎日の習慣リマインダー (8時、13時、18時)' : 'Daily Habit Reminder (8AM, 1PM, 6PM)';
+  String get dailyHabitReminder => locale.languageCode == 'ko' ? '매일 습관 알림 (7시, 12시, 18시)' : 
+                                 locale.languageCode == 'ja' ? '毎日の習慣リマインダー (7時、12時、18時)' : 'Daily Habit Reminder (7AM, 12PM, 6PM)';
   
-  String get notificationDescription => locale.languageCode == 'ko' ? '매일 오전 8시, 오후 1시, 오후 6시에 습관 체크를 알려드려요' : 
-                                      locale.languageCode == 'ja' ? '毎日午前8時、午後1時、午後6時に習慣チェックをお知らせします' : 'We\'ll remind you to check your habits at 8AM, 1PM, and 6PM every day';
+  String get notificationDescription => locale.languageCode == 'ko' ? '매일 오전 7시, 오후 12시, 오후 6시에 습관 체크를 알려드려요' : 
+                                      locale.languageCode == 'ja' ? '毎日午前7時、午後12時、午後6時に習慣チェックをお知らせします' : 'We\'ll remind you to check your habits at 7AM, 12PM, and 6PM every day';
   
-  String get notificationEnabled => locale.languageCode == 'ko' ? '알림이 활성화되었습니다. 매일 8시, 13시, 18시에 다양한 동기부여 메시지를 받아보세요!' : 
-                                  locale.languageCode == 'ja' ? '通知が有効になりました。毎日8時、13時、18時に様々なモチベーションメッセージを受け取りましょう！' : 'Notifications are enabled. Receive various motivational messages at 8AM, 1PM, and 6PM every day!';
+  String get notificationEnabled => locale.languageCode == 'ko' ? '알림이 활성화되었습니다. 매일 7시, 12시, 18시에 다양한 동기부여 메시지를 받아보세요!' : 
+                                  locale.languageCode == 'ja' ? '通知が有効になりました。毎日7時、12時、18時に様々なモチベーションメッセージを受け取りましょう！' : 'Notifications are enabled. Receive various motivational messages at 7AM, 12PM, and 6PM every day!';
 
   // 하단 네비게이션 탭 텍스트들
   String get templatesTab => locale.languageCode == 'ko' ? '템플릿' : 
