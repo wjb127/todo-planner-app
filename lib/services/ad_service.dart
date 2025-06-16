@@ -23,9 +23,9 @@ class AdService {
   
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-2803803669720807/6565166543'; // Android 배너광고 ID
+      return 'ca-app-pub-2803803669720807/1896577546'; // Android 배너광고 ID
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-2803803669720807/1896577546'; // iOS 배너광고 ID
+      return 'ca-app-pub-2803803669720807/2089801622'; // iOS 배너광고 ID
     }
     throw UnsupportedError('Unsupported platform');
   }
