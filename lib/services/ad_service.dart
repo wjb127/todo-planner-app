@@ -34,6 +34,10 @@ class AdService {
   static bool _isInterstitialAdReady = false;
   static bool _isLoadingAd = false;
 
+  // 상태 확인을 위한 getter 메서드들
+  static bool get isInitialized => _isInitialized;
+  static bool get isInterstitialAdReady => _isInterstitialAdReady;
+
   // 애드몹 초기화
   static Future<void> initialize() async {
     if (_isInitialized) {
@@ -93,7 +97,9 @@ class AdService {
     }
     
     _isLoadingAd = true;
-    print('📱 전면광고 로드 시작... ID: $interstitialAdUnitId');
+    print('📱 전면광고 로드 시작...');
+    print('🎯 광고 ID: $interstitialAdUnitId');
+    print('🔧 테스트 모드: $_isTestMode');
     
     InterstitialAd.load(
       adUnitId: interstitialAdUnitId,
@@ -131,16 +137,27 @@ class AdService {
           _isInterstitialAdReady = false;
           _isLoadingAd = false;
           
-          // 에러 코드에 따른 재시도 로직
+          // 에러 코드에 따른 재시도 로직 (더 보수적으로)
           if (error.code == 0) { // Too many requests
-            // 10초 후 재시도
-            Future.delayed(const Duration(seconds: 10), () {
-              _loadInterstitialAd();
+            print('⏱️ 요청 과다로 60초 후 재시도');
+            Future.delayed(const Duration(seconds: 60), () {
+              if (!_isTestMode && !_isInterstitialAdReady) {
+                _loadInterstitialAd();
+              }
+            });
+          } else if (error.code == 1) { // Frequency cap or no ad
+            print('🚫 광고 빈도 제한 또는 광고 없음 - 5분 후 재시도');
+            Future.delayed(const Duration(minutes: 5), () {
+              if (!_isTestMode && !_isInterstitialAdReady) {
+                _loadInterstitialAd();
+              }
             });
           } else {
-            // 5초 후 재시도
-            Future.delayed(const Duration(seconds: 5), () {
-              _loadInterstitialAd();
+            print('🔄 30초 후 재시도');
+            Future.delayed(const Duration(seconds: 30), () {
+              if (!_isTestMode && !_isInterstitialAdReady) {
+                _loadInterstitialAd();
+              }
             });
           }
         },
@@ -151,6 +168,17 @@ class AdService {
   // 전면 광고 표시
   static Future<void> showInterstitialAd() async {
     print('🎯 광고 표시 요청 - 테스트모드: $_isTestMode, 광고준비: $_isInterstitialAdReady');
+    
+    // 초기화되지 않았다면 초기화 시도
+    if (!_isInitialized) {
+      print('🔄 광고 서비스 초기화되지 않음 - 초기화 시도');
+      await initialize();
+      // 초기화 후 바로 광고 로드 시도
+      if (!_isTestMode && !_isInterstitialAdReady && !_isLoadingAd) {
+        _loadInterstitialAd();
+      }
+      return;
+    }
     
     // 테스트 모드에서는 광고 표시하지 않음
     if (_isTestMode) {
@@ -166,19 +194,25 @@ class AdService {
     
     if (_isInterstitialAdReady && _interstitialAd != null) {
       print('🚀 전면광고 표시!');
-      await _interstitialAd!.show();
+      try {
+        await _interstitialAd!.show();
+      } catch (e) {
+        print('❌ 광고 표시 중 오류: $e');
+        // 표시 실패 시 광고 객체 정리
+        _interstitialAd?.dispose();
+        _interstitialAd = null;
+        _isInterstitialAdReady = false;
+        _loadInterstitialAd();
+      }
     } else {
-      print('⏳ 광고가 아직 준비되지 않음 - 다시 로드 시도');
-      // 광고가 준비되지 않았다면 다시 로드 시도
-      _loadInterstitialAd();
+      print('⏳ 광고가 아직 준비되지 않음');
+      // 로딩 중이 아니라면 로드 시도
+      if (!_isLoadingAd) {
+        print('🔄 광고 다시 로드 시도');
+        _loadInterstitialAd();
+      }
     }
   }
-
-  // 광고 준비 상태 확인
-  static bool get isAdReady => _isInterstitialAdReady;
-  
-  // 초기화 상태 확인
-  static bool get isInitialized => _isInitialized;
 
   // 광고 제거 상태 확인
   static Future<bool> isAdRemoved() async {

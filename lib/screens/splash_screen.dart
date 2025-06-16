@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
+import '../services/ad_service.dart';
 import '../main.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -25,8 +26,6 @@ class _SplashScreenState extends State<SplashScreen>
     
     // 상태바 숨기기
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
-    
-    // 상태 메시지는 이미 초기화됨
     
     // 애니메이션 초기화
     _animationController = AnimationController(
@@ -58,24 +57,89 @@ class _SplashScreenState extends State<SplashScreen>
     // 애니메이션 시작
     _animationController.forward();
     
-    // 최소 2초 대기 (사용자 경험을 위해)
+    setState(() {
+      _statusMessage = 'Initializing...';
+    });
+    
+    // 최소 2초는 대기 (사용자 경험)
     await Future.delayed(const Duration(seconds: 2));
+    
+    // AdService 초기화 확인 및 광고 준비 대기
+    try {
+      setState(() {
+        _statusMessage = 'Preparing ads...';
+      });
+      
+      // AdService가 초기화되었는지 확인
+      if (!AdService.isInitialized) {
+        print('🔄 AdService 초기화되지 않음 - 초기화 시도');
+        await AdService.initialize();
+      }
+      
+      // 테스트 모드가 아니고 광고가 제거되지 않았다면 광고 준비 대기
+      if (!await AdService.getTestMode() && !await AdService.isAdRemoved()) {
+        // 최대 5초까지 광고 준비 대기
+        int waitCount = 0;
+        while (!AdService.isInterstitialAdReady && waitCount < 10) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          waitCount++;
+          if (waitCount == 5) {
+            setState(() {
+              _statusMessage = 'Loading ads...';
+            });
+          }
+        }
+        
+        if (AdService.isInterstitialAdReady) {
+          print('✅ 광고 준비 완료');
+        } else {
+          print('⏰ 광고 준비 시간 초과 - 계속 진행');
+        }
+      } else {
+        print('🧪 테스트 모드 또는 광고 제거됨 - 광고 준비 건너뜀');
+      }
+      
+    } catch (e) {
+      print('❌ 광고 초기화 실패: $e');
+    }
     
     setState(() {
       _statusMessage = 'Ready!';
       _loadingComplete = true;
     });
     
-    // 메인 화면으로 이동
+    // 추가 0.5초 대기 후 메인 화면으로 이동
+    await Future.delayed(const Duration(milliseconds: 500));
     _navigateToMain();
   }
-
-
 
   void _navigateToMain() async {
     if (_loadingComplete) {
       // 상태바 복원
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      
+      // 스플래시 이후 광고 표시 시도
+      bool adShown = false;
+      try {
+        print('🚀 앱 시작 - 초기 광고 표시 준비');
+        
+        // 광고가 준비되었다면 표시
+        if (AdService.isInterstitialAdReady) {
+          print('🎯 초기 광고 표시 시도');
+          await AdService.showInterstitialAd();
+          adShown = true;
+          print('✅ 초기 광고 표시 완료');
+        } else {
+          print('⏳ 광고가 아직 준비되지 않음 - 메인 화면으로 이동');
+        }
+      } catch (e) {
+        print('❌ 스플래시 광고 표시 실패: $e');
+      }
+      
+      // 광고가 표시되지 않았다면 약간의 지연 후 메인 화면으로 이동
+      if (!adShown) {
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
       
       // 메인 화면으로 이동
       if (mounted) {

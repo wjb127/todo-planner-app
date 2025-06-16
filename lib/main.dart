@@ -52,6 +52,24 @@ void main() async {
     print('❌ 알림 스케줄링 실패: $e');
   }
   
+  // AdService 초기화 (중요!)
+  try {
+    print('📱 광고 서비스 초기화 시작');
+    await AdService.initialize();
+    print('📱 광고 서비스 초기화 완료');
+  } catch (e) {
+    print('❌ 광고 서비스 초기화 실패: $e');
+  }
+  
+  // PurchaseService 초기화
+  try {
+    print('💰 인앱결제 서비스 초기화 시작');
+    await PurchaseService.initialize();
+    print('💰 인앱결제 서비스 초기화 완료');
+  } catch (e) {
+    print('❌ 인앱결제 서비스 초기화 실패: $e');
+  }
+  
   print('🚀 앱 실행 시작');
   runApp(const MyApp());
 }
