@@ -615,10 +615,16 @@ class _TemplateScreenState extends State<TemplateScreen> {
                         ),
               ),
               
-              // Apply Template Button
+              // Apply Template Button - 하단 네비게이션 바와 겹치지 않도록 위치 조정
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.fromLTRB(
+                  16, 
+                  16, 
+                  16, 
+                  // 배너광고(60) + 하단 네비게이션 바 여백(80) + 추가 여백(16)
+                  _isAdLoaded ? 156 : 96,
+                ),
                 decoration: const BoxDecoration(
                   color: Colors.transparent,
                 ),
@@ -644,6 +650,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 Container(
                   height: 60,
                   color: Colors.white,
+                  margin: EdgeInsets.only(bottom: 80), // 하단 네비게이션 바 여백
                   child: AdWidget(ad: _bannerAd!),
                 ),
               
