@@ -23,7 +23,7 @@ class AdService {
   
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-2803803669720807/1896577546'; // Android 배너광고 ID
+      return 'ca-app-pub-2803803669720807/6565166543'; // Android 배너광고 ID
     } else if (Platform.isIOS) {
       return 'ca-app-pub-2803803669720807/1896577546'; // iOS 배너광고 ID
     }
@@ -217,17 +217,28 @@ class AdService {
   // 배너광고 생성
   static BannerAd createBannerAd() {
     print('📱 배너광고 생성: $bannerAdUnitId');
+    print('🔧 플랫폼: ${Platform.isAndroid ? "Android" : "iOS"}');
+    
     return BannerAd(
       adUnitId: bannerAdUnitId,
       size: AdSize.banner,
       request: const AdRequest(),
       listener: BannerAdListener(
         onAdLoaded: (ad) {
-          print('✅ 배너광고 로드 완료');
+          print('✅ 배너광고 로드 완료 - ID: $bannerAdUnitId');
         },
         onAdFailedToLoad: (ad, error) {
           print('❌ 배너광고 로드 실패: $error');
+          print('🔍 에러 코드: ${error.code}');
+          print('🔍 에러 도메인: ${error.domain}');
+          print('🔍 에러 메시지: ${error.message}');
           ad.dispose();
+        },
+        onAdOpened: (ad) {
+          print('📱 배너광고 열림');
+        },
+        onAdClosed: (ad) {
+          print('📱 배너광고 닫힘');
         },
       ),
     );

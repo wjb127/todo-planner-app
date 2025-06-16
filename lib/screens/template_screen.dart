@@ -270,14 +270,28 @@ class _TemplateScreenState extends State<TemplateScreen> {
       return;
     }
 
-    _bannerAd = AdService.createBannerAd();
-    _bannerAd!.load().then((_) {
+    try {
+      _bannerAd = AdService.createBannerAd();
+      await _bannerAd!.load();
       if (mounted) {
         setState(() {
           _isAdLoaded = true;
         });
+        print('✅ 템플릿 화면 배너광고 로드 성공');
       }
-    });
+    } catch (e) {
+      print('❌ 템플릿 화면 배너광고 로드 실패: $e');
+      _bannerAd?.dispose();
+      _bannerAd = null;
+      _isAdLoaded = false;
+      
+      // 10초 후 재시도
+      Future.delayed(const Duration(seconds: 10), () {
+        if (mounted && !_isAdLoaded) {
+          _loadBannerAd();
+        }
+      });
+    }
   }
 
   @override
