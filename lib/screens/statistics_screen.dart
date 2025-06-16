@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../models/todo_item.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
@@ -17,6 +18,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
   List<TodoItem> _template = [];
   Map<String, Map<String, bool>> _statisticsData = {};
   bool _isLoading = true;
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
   
   // 외부에서 새로고침을 호출할 수 있는 공개 메서드
   void refresh() {
@@ -30,6 +33,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
   void initState() {
     super.initState();
     _loadStatistics();
+    _loadBannerAd();
   }
 
   @override
@@ -37,14 +41,30 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
     super.didChangeDependencies();
     // 페이지가 다시 보여질 때마다 데이터 새로고침
     _loadStatistics();
-    // 통계 화면 진입 시 광고 표시
-    _showAdOnStatisticsView();
   }
 
-  Future<void> _showAdOnStatisticsView() async {
-    // 잠시 후 광고 표시 (UI 로딩 후)
-    await Future.delayed(const Duration(milliseconds: 500));
-    await AdService.showInterstitialAd();
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadBannerAd() async {
+    // 광고 제거 구매 여부 확인
+    final adRemoved = await AdService.isAdRemoved();
+    if (adRemoved) {
+      print('💰 광고 제거됨: 배너광고 로드 건너뜀');
+      return;
+    }
+
+    _bannerAd = AdService.createBannerAd();
+    _bannerAd!.load().then((_) {
+      if (mounted) {
+        setState(() {
+          _isAdLoaded = true;
+        });
+      }
+    });
   }
 
   String _formatDate(DateTime date) {
@@ -310,8 +330,8 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
           child: Column(
             children: [
               // Header
-              Padding(
-                padding: const EdgeInsets.all(24.0),
+              Container(
+                padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 8.0),
                 child: Row(
                   children: [
                     Expanded(
@@ -322,26 +342,27 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                             localizations?.locale.languageCode == 'ko' ? '통계' :
                             localizations?.locale.languageCode == 'ja' ? '統計' : 'Statistics',
                             style: const TextStyle(
-                              fontSize: 28,
+                              fontSize: 26,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 4),
                           Text(
-                            localizations?.locale.languageCode == 'ko' ? '습관 완료율과 진행 상황을 확인하세요' :
-                            localizations?.locale.languageCode == 'ja' ? '習慣完了率と進行状況を確認しましょう' : 'Check your habit completion rates and progress',
+                            localizations?.locale.languageCode == 'ko' ? '습관 성취도와 경향을 확인하세요' :
+                            localizations?.locale.languageCode == 'ja' ? '習慣の達成度と傾向を確認してください' : 'Check your habit achievements and trends',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               color: Colors.white.withOpacity(0.9),
                             ),
+                            textAlign: TextAlign.left,
                           ),
                         ],
                       ),
                     ),
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
+                        color: Colors.white.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.3),
@@ -350,9 +371,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                       ),
                       child: IconButton(
                         onPressed: _loadStatistics,
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.refresh_rounded, 
-                          color: Theme.of(context).colorScheme.primary,
+                          color: Colors.white,
                         ),
                         tooltip: localizations?.locale.languageCode == 'ko' ? '새로고침' :
                                 localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh',
@@ -361,6 +382,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
               
               // Content
               Expanded(
@@ -542,438 +564,142 @@ class _StatisticsScreenState extends State<StatisticsScreen> with AutomaticKeepA
                             ),
                             const SizedBox(height: 20),
                             
-                            if (completionRates.isEmpty)
-                              Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20),
-                                  child: Text(
-                                    localizations?.locale.languageCode == 'ko' ? '통계 데이터가 없습니다.' :
-                                    localizations?.locale.languageCode == 'ja' ? '統計データが見つかりません。' : 'No statistics data found.',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            else
-                              ...completionRates.entries.map((entry) {
-                                final title = entry.key;
-                                final rate = entry.value;
-                                final percentage = (rate * 100).toStringAsFixed(1);
-                                final color = _getRateColor(rate);
-                                
-                                return Container(
-                                  margin: const EdgeInsets.only(bottom: 16),
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: Colors.grey.shade200),
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              title,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: color.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              '$percentage%',
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: color,
-                                              ),
-                                            ),
-                                          ),
+                            // 전체 평균 완료율 표시
+                            if (completionRates.isNotEmpty) ...[
+                              Builder(
+                                builder: (context) {
+                                  final averageRate = completionRates.values.reduce((a, b) => a + b) / completionRates.length;
+                                  final title = _getTitle(averageRate);
+                                  final titleColor = _getTitleColor(averageRate);
+                                  
+                                  return Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          titleColor.withOpacity(0.1),
+                                          titleColor.withOpacity(0.05),
                                         ],
                                       ),
-                                      const SizedBox(height: 12),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: LinearProgressIndicator(
-                                          value: rate,
-                                          backgroundColor: Colors.grey.shade300,
-                                          valueColor: AlwaysStoppedAnimation<Color>(color),
-                                          minHeight: 8,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: titleColor.withOpacity(0.3)),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          title,
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: titleColor,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }).toList(),
-                          ],
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      
-                      // Summary Section
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    Icons.summarize_rounded,
-                                    color: Theme.of(context).colorScheme.primary,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  localizations?.locale.languageCode == 'ko' ? '요약' :
-                                  localizations?.locale.languageCode == 'ja' ? '要約' : 'Summary',
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            _buildSummaryRow(
-                              localizations?.locale.languageCode == 'ko' ? '분석 기간' :
-                              localizations?.locale.languageCode == 'ja' ? '分析期間' : 'Analysis Period',
-                              localizations?.locale.languageCode == 'ko' ? '최근 30일 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "없음"} ~ ${_formatDate(DateTime.now())})' :
-                              localizations?.locale.languageCode == 'ja' ? '最近30日 (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "なし"} ~ ${_formatDate(DateTime.now())})' : 'Last 30 days (${_statisticsData.keys.isNotEmpty ? _statisticsData.keys.reduce((a, b) => a.compareTo(b) < 0 ? a : b) : "None"} ~ ${_formatDate(DateTime.now())})'
-                            ),
-                            _buildSummaryRow(
-                              localizations?.locale.languageCode == 'ko' ? '총 분석 일수' :
-                              localizations?.locale.languageCode == 'ja' ? '総分析日数' : 'Total Analysis Days',
-                              localizations?.locale.languageCode == 'ko' ? '${_statisticsData.length}일' :
-                              localizations?.locale.languageCode == 'ja' ? '${_statisticsData.length}日' : '${_statisticsData.length} days'
-                            ),
-                            _buildSummaryRow(
-                              localizations?.locale.languageCode == 'ko' ? '템플릿 항목 수' :
-                              localizations?.locale.languageCode == 'ja' ? 'テンプレート項目数' : 'Template Items',
-                              localizations?.locale.languageCode == 'ko' ? '${_template.length}개' :
-                              localizations?.locale.languageCode == 'ja' ? '${_template.length}個' : '${_template.length} habits'
-                            ),
-                            if (completionRates.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              _buildSummaryRow(
-                                localizations?.locale.languageCode == 'ko' ? '평균 완료율' :
-                                localizations?.locale.languageCode == 'ja' ? '平均完了率' : 'Average Completion Rate',
-                                '${(completionRates.values.reduce((a, b) => a + b) / completionRates.length * 100).toStringAsFixed(1)}%'
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${(averageRate * 100).toStringAsFixed(1)}%',
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.w900,
+                                            color: titleColor,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          localizations?.locale.languageCode == 'ko' ? '전체 평균 완료율' :
+                                          localizations?.locale.languageCode == 'ja' ? '全体平均完了率' : 'Overall Completion Rate',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: titleColor.withOpacity(0.8),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
-                              _buildSummaryRow(
-                                localizations?.locale.languageCode == 'ko' ? '최고 완료율' :
-                                localizations?.locale.languageCode == 'ja' ? '最高完了率' : 'Highest Completion Rate',
-                                '${(completionRates.values.reduce((a, b) => a > b ? a : b) * 100).toStringAsFixed(1)}%'
-                              ),
-                              _buildSummaryRow(
-                                localizations?.locale.languageCode == 'ko' ? '최저 완료율' :
-                                localizations?.locale.languageCode == 'ja' ? '最低完了率' : 'Lowest Completion Rate',
-                                '${(completionRates.values.reduce((a, b) => a < b ? a : b) * 100).toStringAsFixed(1)}%'
-                              ),
-                              const SizedBox(height: 12),
-                              Container(
-                                width: double.infinity,
+                              const SizedBox(height: 20),
+                            ],
+                            
+                            // 습관별 완료율 목록
+                            ...completionRates.entries.map((entry) {
+                              final rate = entry.value;
+                              final color = _getRateColor(rate);
+                              
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.1),
-                                      _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.05),
-                                    ],
-                                  ),
+                                  color: Colors.grey.shade50,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length).withOpacity(0.3),
-                                    width: 1,
-                                  ),
+                                  border: Border.all(color: Colors.grey.shade200),
                                 ),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      Icons.military_tech_rounded,
-                                      color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length),
-                                      size: 32,
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            entry.key,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: color,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            '${(rate * 100).toStringAsFixed(1)}%',
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Text(
-                                      localizations?.locale.languageCode == 'ko' ? '칭호' :
-                                      localizations?.locale.languageCode == 'ja' ? '称号' : 'Title',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      '"${_getTitle(completionRates.values.reduce((a, b) => a + b) / completionRates.length)}"',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: _getTitleColor(completionRates.values.reduce((a, b) => a + b) / completionRates.length),
-                                      ),
+                                    LinearProgressIndicator(
+                                      value: rate,
+                                      backgroundColor: Colors.grey.shade300,
+                                      valueColor: AlwaysStoppedAnimation<Color>(color),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              );
+                            }).toList(),
                           ],
                         ),
                       ),
                       
-                      const SizedBox(height: 20),
-                      
-                      // Ad Removal Purchase Section (주석처리)
-                      /*
-                      FutureBuilder<bool>(
-                        future: AdService.isAdRemoved(),
-                        builder: (context, snapshot) {
-                          final isAdRemoved = snapshot.data ?? false;
-                          
-                          if (isAdRemoved) {
-                            return Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.green.shade50,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: Colors.green.shade200),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.check_circle_rounded,
-                                    color: Colors.green.shade600,
-                                    size: 24,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Expanded(
-                                    child: Text(
-                                      '광고가 제거되었습니다!',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                          
-                          return Container(
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber.shade100,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Icon(
-                                        Icons.star_rounded,
-                                        color: Colors.amber.shade700,
-                                        size: 20,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    const Text(
-                                      '프리미엄 업그레이드',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  '광고 없는 깔끔한 환경에서 습관을 관리하세요!',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: ElevatedButton.icon(
-                                    onPressed: () async {
-                                      try {
-                                        await PurchaseService.purchaseRemoveAds();
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: const Text('구매 요청이 처리되었습니다.'),
-                                              backgroundColor: Colors.green.shade600,
-                                              behavior: SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              margin: const EdgeInsets.all(16),
-                                            ),
-                                          );
-                                        }
-                                      } catch (e) {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('구매 중 오류가 발생했습니다: $e'),
-                                              backgroundColor: Colors.red.shade600,
-                                              behavior: SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              margin: const EdgeInsets.all(16),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                    icon: const Icon(Icons.shopping_cart_rounded),
-                                    label: Text('광고 제거하기 - ${PurchaseService.getRemoveAdsPrice()}'),
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      backgroundColor: Colors.amber.shade600,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Center(
-                                  child: TextButton(
-                                    onPressed: () async {
-                                      try {
-                                        await PurchaseService.restorePurchases();
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: const Text('구매 복원이 완료되었습니다.'),
-                                              backgroundColor: Colors.blue.shade600,
-                                              behavior: SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              margin: const EdgeInsets.all(16),
-                                            ),
-                                          );
-                                        }
-                                      } catch (e) {
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text('복원 중 오류가 발생했습니다: $e'),
-                                              backgroundColor: Colors.red.shade600,
-                                              behavior: SnackBarBehavior.floating,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              margin: const EdgeInsets.all(16),
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                    child: Text(
-                                      '구매 복원',
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                      
-                      const SizedBox(height: 20),
-                      */
+                      // 배너광고를 위한 하단 여백
+                      SizedBox(height: _isAdLoaded ? 100 : 20),
                     ],
                   ),
                 ),
               ),
+              
+              // 하단 배너광고
+              if (_isAdLoaded && _bannerAd != null)
+                Container(
+                  height: 60,
+                  color: Colors.white,
+                  child: AdWidget(ad: _bannerAd!),
+                ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
       ),
     );
   }

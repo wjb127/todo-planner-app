@@ -23,9 +23,9 @@ class AdService {
   
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-2803803669720807/6300978111'; // Android 배너광고 ID
+      return 'ca-app-pub-2803803669720807/1896577546'; // Android 배너광고 ID
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-2803803669720807/2934735716'; // iOS 배너광고 ID
+      return 'ca-app-pub-2803803669720807/1896577546'; // iOS 배너광고 ID
     }
     throw UnsupportedError('Unsupported platform');
   }
@@ -212,6 +212,25 @@ class AdService {
         _loadInterstitialAd();
       }
     }
+  }
+
+  // 배너광고 생성
+  static BannerAd createBannerAd() {
+    print('📱 배너광고 생성: $bannerAdUnitId');
+    return BannerAd(
+      adUnitId: bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          print('✅ 배너광고 로드 완료');
+        },
+        onAdFailedToLoad: (ad, error) {
+          print('❌ 배너광고 로드 실패: $error');
+          ad.dispose();
+        },
+      ),
+    );
   }
 
   // 광고 제거 상태 확인

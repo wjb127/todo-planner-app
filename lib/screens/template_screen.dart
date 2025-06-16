@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../models/todo_item.dart';
 import '../services/storage_service.dart';
 import '../services/ad_service.dart';
@@ -17,11 +18,21 @@ class _TemplateScreenState extends State<TemplateScreen> {
   final TextEditingController _textController = TextEditingController();
   bool _isLoading = true;
   int _addHabitCount = 0; // 습관 추가 횟수 카운터
+  BannerAd? _bannerAd;
+  bool _isAdLoaded = false;
 
   @override
   void initState() {
     super.initState();
     _loadTemplate();
+    _loadBannerAd();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    _bannerAd?.dispose();
+    super.dispose();
   }
 
   Future<void> _loadTemplate() async {
@@ -251,6 +262,24 @@ class _TemplateScreenState extends State<TemplateScreen> {
     }
   }
 
+  Future<void> _loadBannerAd() async {
+    // 광고 제거 구매 여부 확인
+    final adRemoved = await AdService.isAdRemoved();
+    if (adRemoved) {
+      print('💰 광고 제거됨: 배너광고 로드 건너뜀');
+      return;
+    }
+
+    _bannerAd = AdService.createBannerAd();
+    _bannerAd!.load().then((_) {
+      if (mounted) {
+        setState(() {
+          _isAdLoaded = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -293,38 +322,35 @@ class _TemplateScreenState extends State<TemplateScreen> {
           child: Column(
             children: [
               // Header
-              Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Row(
+              Container(
+                padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 8.0), // 상하 패딩 줄임
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
-                            localizations?.locale.languageCode == 'ja' ? '習慣テンプレート' : 'Habit Templates',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            localizations?.locale.languageCode == 'ko' ? '매일 반복할 습관들을 설정하세요' :
-                            localizations?.locale.languageCode == 'ja' ? '毎日繰り返す習慣을 설정하세요' : 'Create and manage your daily habit templates',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white.withOpacity(0.9),
-                            ),
-                          ),
-                        ],
+                    Text(
+                      localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
+                      localizations?.locale.languageCode == 'ja' ? '繰り返し習慣テンプレート' : 'Repeating Habit Template',
+                      style: const TextStyle(
+                        fontSize: 26, // 폰트 크기 약간 줄임
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
+                      textAlign: TextAlign.left, // 왼쪽 정렬
+                    ),
+                    const SizedBox(height: 4), // 간격 줄임
+                    Text(
+                      localizations?.locale.languageCode == 'ko' ? '매일 실천할 습관을 추가하고 관리하세요' :
+                      localizations?.locale.languageCode == 'ja' ? '毎日実践する習慣を追加・管理してください' : 'Add and manage habits to practice daily',
+                      style: TextStyle(
+                        fontSize: 14, // 폰트 크기 약간 줄임
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                      textAlign: TextAlign.left, // 왼쪽 정렬
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 12), // 간격 줄임
               
               // Add Todo Section
               Container(
@@ -456,7 +482,12 @@ class _TemplateScreenState extends State<TemplateScreen> {
                           ),
                         )
                       : ReorderableListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                          padding: EdgeInsets.fromLTRB(
+                            16, 
+                            16, 
+                            16, 
+                            _isAdLoaded ? 140 : 80, // 배너광고와 버튼을 위한 하단 패딩
+                          ),
                           itemCount: _templateItems.length,
                           onReorder: _reorderItems,
                           proxyDecorator: (child, index, animation) {
@@ -587,16 +618,18 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   ),
                 ),
               ),
+              
+              // 하단 배너광고
+              if (_isAdLoaded && _bannerAd != null)
+                Container(
+                  height: 60,
+                  color: Colors.white,
+                  child: AdWidget(ad: _bannerAd!),
+                ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _textController.dispose();
-    super.dispose();
   }
 } 

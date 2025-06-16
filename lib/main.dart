@@ -201,10 +201,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
   }
 
-  Future<void> _showInterstitialAd() async {
-    print('📊 통계 탭 이동 - 광고 표시');
-    await AdService.showInterstitialAd();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -258,10 +255,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               return;
             }
             
-            // 통계 탭으로 이동할 때 광고 표시
-            if (index == 2) {
-              await _showInterstitialAd();
-            }
+
             setState(() {
               _currentIndex = index;
             });
