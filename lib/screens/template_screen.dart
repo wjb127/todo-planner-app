@@ -333,8 +333,15 @@ class _TemplateScreenState extends State<TemplateScreen> {
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 
+                          MediaQuery.of(context).padding.top - 
+                          MediaQuery.of(context).padding.bottom,
+              ),
+              child: Column(
+                children: [
               // Header
               Container(
                 padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 8.0), // 상하 패딩 줄임
@@ -442,25 +449,27 @@ class _TemplateScreenState extends State<TemplateScreen> {
               const SizedBox(height: 16),
               
               // Todo List
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: _templateItems.isEmpty
-                      ? SingleChildScrollView(
-                          child: Container(
-                            height: MediaQuery.of(context).size.height * 0.3,
-                            child: Center(
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16),
+                constraints: BoxConstraints(
+                  minHeight: 200,
+                  maxHeight: _templateItems.isEmpty 
+                    ? 200
+                    : MediaQuery.of(context).size.height * 0.4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: _templateItems.isEmpty
+                    ? Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -492,10 +501,8 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-                        )
-                      : ReorderableListView.builder(
+                            )
+                    : ReorderableListView.builder(
                           padding: EdgeInsets.fromLTRB(
                             16, 
                             16, 
@@ -606,7 +613,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
                             );
                           },
                         ),
-                ),
               ),
               
               // Apply Template Button
@@ -640,7 +646,12 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   color: Colors.white,
                   child: AdWidget(ad: _bannerAd!),
                 ),
-            ],
+              
+              // 키보드 여백 추가
+              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+                ],
+              ),
+            ),
           ),
         ),
       ),
