@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/notification_service.dart';
 import '../services/backup_service.dart';
+import '../services/firebase_service.dart';
 import '../l10n/app_localizations.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -38,18 +39,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       if (value) {
-        await NotificationService.scheduleDailyNotification();
-        _showSnackBar(_getLocalizations().notificationEnabled);
+        // 권한 요청과 함께 알림 스케줄링
+        final success = await NotificationService.requestPermissionsAndSchedule();
+        if (success) {
+          _showSnackBar(_getLocalizations().notificationEnabled);
+          setState(() {
+            _notificationEnabled = true;
+          });
+        } else {
+          _showSnackBar('알림 권한이 필요합니다. 설정에서 알림을 허용해주세요.', isError: true);
+          setState(() {
+            _notificationEnabled = false;
+          });
+        }
       } else {
         await NotificationService.cancelDailyNotification();
         _showSnackBar('알림이 해제되었습니다');
+        setState(() {
+          _notificationEnabled = false;
+        });
       }
-      
-      setState(() {
-        _notificationEnabled = value;
-      });
     } catch (e) {
       _showSnackBar('설정 중 오류가 발생했습니다: $e', isError: true);
+      setState(() {
+        _notificationEnabled = false;
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -372,6 +386,159 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ],
                       ),
                     ),
+                    
+                    const SizedBox(height: 20),
+                    
+                    // Firebase 테스트 섹션 (개발용) - 출시버전에서 숨김
+                    /*
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.bug_report_rounded,
+                                  color: Colors.red.shade600,
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Text(
+                                'Firebase 테스트',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          const Text(
+                            'Crashlytics 모니터링 테스트를 위한 기능입니다.',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    await FirebaseService.logMessage('사용자가 커스텀 로그 테스트 버튼을 클릭했습니다.');
+                                    _showSnackBar('커스텀 로그가 기록되었습니다.');
+                                  },
+                                  icon: const Icon(Icons.description_rounded),
+                                  label: const Text('로그 테스트'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade50,
+                                    foregroundColor: Colors.blue.shade700,
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    try {
+                                      await FirebaseService.recordError(
+                                        Exception('테스트 오류입니다'),
+                                        StackTrace.current,
+                                        reason: '사용자가 오류 테스트 버튼을 클릭했습니다',
+                                        fatal: false,
+                                      );
+                                      _showSnackBar('테스트 오류가 기록되었습니다.');
+                                    } catch (e) {
+                                      _showSnackBar('오류 기록 실패: $e', isError: true);
+                                    }
+                                  },
+                                  icon: const Icon(Icons.warning_rounded),
+                                  label: const Text('오류 테스트'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.orange.shade50,
+                                    foregroundColor: Colors.orange.shade700,
+                                    elevation: 0,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          
+                          const SizedBox(height: 12),
+                          
+                          // Analytics 테스트 버튼
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                await FirebaseService.logCustomEvent('settings_analytics_test', {
+                                  'test_type': 'manual_analytics_test',
+                                  'timestamp': DateTime.now().toIso8601String(),
+                                  'screen': 'settings',
+                                });
+                                _showSnackBar('Analytics 이벤트가 기록되었습니다.');
+                              },
+                              icon: const Icon(Icons.analytics_rounded),
+                              label: const Text('Analytics 테스트'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green.shade50,
+                                foregroundColor: Colors.green.shade700,
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                          
+                          const SizedBox(height: 12),
+                          
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final confirmed = await _showConfirmDialog(
+                                  '크래시 테스트',
+                                  '이 기능은 앱을 강제로 종료시킵니다.\n릴리즈 모드에서만 작동하며, Crashlytics에서 크래시 정보를 확인할 수 있습니다.\n\n계속하시겠습니까?',
+                                );
+                                
+                                if (confirmed) {
+                                  await FirebaseService.testCrash();
+                                }
+                              },
+                              icon: const Icon(Icons.warning_amber_rounded),
+                              label: const Text('크래시 테스트 (릴리즈 모드만)'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade50,
+                                foregroundColor: Colors.red.shade700,
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    */
                   ],
                 ),
         ),

@@ -12,6 +12,7 @@ import 'services/ad_service.dart';
 import 'services/purchase_service.dart';
 import 'services/notification_service.dart';
 import 'services/backup_service.dart';
+import 'services/firebase_service.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -22,6 +23,18 @@ void main() async {
   } catch (e) {
     print('❌ Flutter 바인딩 초기화 실패: $e');
     // 바인딩 실패 시에도 앱 실행 계속
+  }
+  
+  // Firebase 초기화 (가장 먼저 실행)
+  try {
+    print('🔥 Firebase 서비스 초기화 시작');
+    await FirebaseService.initialize();
+    print('🔥 Firebase 서비스 초기화 완료');
+    
+    // 앱 시작 이벤트 기록
+    await FirebaseService.logAppStart();
+  } catch (e) {
+    print('❌ Firebase 서비스 초기화 실패: $e');
   }
   
   // 안전한 서비스 초기화 with 오류 처리

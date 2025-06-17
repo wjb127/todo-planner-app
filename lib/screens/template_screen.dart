@@ -338,53 +338,82 @@ class _TemplateScreenState extends State<TemplateScreen> {
               constraints: BoxConstraints(
                 minHeight: MediaQuery.of(context).size.height - 
                           MediaQuery.of(context).padding.top - 
-                          MediaQuery.of(context).padding.bottom,
+                          MediaQuery.of(context).padding.bottom - 
+                          MediaQuery.of(context).viewInsets.bottom,
               ),
               child: Column(
                 children: [
-              // Header
+              // Header - 미려한 디자인으로 개선
               Container(
-                padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 8.0), // 상하 패딩 줄임
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+                child: Row(
                   children: [
-                    Text(
-                      localizations?.locale.languageCode == 'ko' ? '반복 습관 템플릿' :
-                      localizations?.locale.languageCode == 'ja' ? '繰り返し習慣テンプレート' : 'Repeating Habit Template',
-                      style: const TextStyle(
-                        fontSize: 26, // 폰트 크기 약간 줄임
-                        fontWeight: FontWeight.bold,
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome_rounded,
                         color: Colors.white,
+                        size: 28,
                       ),
-                      textAlign: TextAlign.left, // 왼쪽 정렬
                     ),
-                    const SizedBox(height: 4), // 간격 줄임
-                    Text(
-                      localizations?.locale.languageCode == 'ko' ? '매일 실천할 습관을 추가하고 관리하세요' :
-                      localizations?.locale.languageCode == 'ja' ? '毎日実践する習慣を追加・管理してください' : 'Add and manage habits to practice daily',
-                      style: TextStyle(
-                        fontSize: 14, // 폰트 크기 약간 줄임
-                        color: Colors.white.withOpacity(0.9),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '습관 템플릿' :
+                            localizations?.locale.languageCode == 'ja' ? '習慣テンプレート' : 'Habit Template',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            localizations?.locale.languageCode == 'ko' ? '매일 실천할 루틴을 만들어보세요' :
+                            localizations?.locale.languageCode == 'ja' ? '毎日実践するルーチンを作ってみましょう' : 'Build your daily routine',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.white.withOpacity(0.85),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      textAlign: TextAlign.left, // 왼쪽 정렬
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12), // 간격 줄임
+              const SizedBox(height: 8), // 간격 더 줄임
               
-              // Add Todo Section
+              // Add Todo Section - 미려한 디자인으로 개선
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -399,26 +428,70 @@ class _TemplateScreenState extends State<TemplateScreen> {
                               hintText: localizations?.locale.languageCode == 'ko' ? '새로운 습관 추가' :
                                        localizations?.locale.languageCode == 'ja' ? '新しい習慣を追加' : 'Enter new habit',
                               border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 8), // 패딩 줄임
                             ),
                             onSubmitted: (_) => _addHabit(),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        ElevatedButton(
-                          onPressed: _addHabit,
-                          child: Text(localizations?.locale.languageCode == 'ko' ? '추가' :
-                                     localizations?.locale.languageCode == 'ja' ? '追加' : 'Add'),
+                        const SizedBox(width: 16),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Theme.of(context).colorScheme.primary,
+                                Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: _addHabit,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.add_rounded,
+                                      color: Colors.white,
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      localizations?.locale.languageCode == 'ko' ? '추가' :
+                                      localizations?.locale.languageCode == 'ja' ? '追加' : 'Add',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8), // 12 → 8로 줄임
                     Row(
                       children: [
                         Text(
                           localizations?.locale.languageCode == 'ko' ? '${_templateItems.length}/30개' :
                           localizations?.locale.languageCode == 'ja' ? '${_templateItems.length}/30個' : '${_templateItems.length}/30 habits',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13, // 14 → 13으로 줄임
                             color: Colors.grey.shade600,
                             fontWeight: FontWeight.w500,
                           ),
@@ -427,15 +500,15 @@ class _TemplateScreenState extends State<TemplateScreen> {
                         if (_templateItems.isNotEmpty) ...[
                           Icon(
                             Icons.drag_indicator_rounded,
-                            size: 16,
+                            size: 14, // 16 → 14로 줄임
                             color: Colors.grey.shade600,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             localizations?.locale.languageCode == 'ko' ? '드래그하여 순서 변경' :
-                            localizations?.locale.languageCode == 'ja' ? 'ドラッグして順序変更' : 'Drag to reorder',
+                            localizations?.locale.languageCode == 'ja' ? 'ドラッグして순序変更' : 'Drag to reorder',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 11, // 12 → 11로 줄임
                               color: Colors.grey.shade600,
                             ),
                           ),
@@ -446,25 +519,28 @@ class _TemplateScreenState extends State<TemplateScreen> {
                 ),
               ),
               
-              const SizedBox(height: 16),
+              const SizedBox(height: 8), // 간격 더 줄임
               
-              // Todo List
+              // Todo List - 미려한 디자인으로 개선
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 20),
                 constraints: BoxConstraints(
-                  minHeight: 200,
-                  maxHeight: _templateItems.isEmpty 
-                    ? 200
-                    : MediaQuery.of(context).size.height * 0.4,
+                  minHeight: 150,
+                  maxHeight: MediaQuery.of(context).size.height * 0.35, // 최대 높이 제한
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, -2),
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
+                    ),
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
@@ -475,26 +551,26 @@ class _TemplateScreenState extends State<TemplateScreen> {
                                 children: [
                                   Icon(
                                     Icons.add_task_rounded,
-                                    size: 64,
+                                    size: 48, // 64 → 48로 줄임
                                     color: Colors.grey.shade400,
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 12), // 16 → 12로 줄임
                                   Text(
                                     localizations?.locale.languageCode == 'ko' ? '템플릿에 습관을 추가해보세요!' :
                                     localizations?.locale.languageCode == 'ja' ? 'テンプレートに習慣を追加してみましょう！' : 'No habits in template',
                                     style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16, // 18 → 16으로 줄임
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
                                     ),
                                     textAlign: TextAlign.center,
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 6), // 8 → 6으로 줄임
                                   Text(
                                     localizations?.locale.languageCode == 'ko' ? '매일 반복할 루틴을 만들어보세요' :
                                     localizations?.locale.languageCode == 'ja' ? '毎日繰り返すルーチンを作ってみましょう' : 'Add your first habit above',
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      fontSize: 13, // 14 → 13으로 줄임
                                       color: Colors.grey.shade500,
                                     ),
                                     textAlign: TextAlign.center,
@@ -503,12 +579,7 @@ class _TemplateScreenState extends State<TemplateScreen> {
                               ),
                             )
                     : ReorderableListView.builder(
-                          padding: EdgeInsets.fromLTRB(
-                            16, 
-                            16, 
-                            16, 
-                            _isAdLoaded ? 140 : 80, // 배너광고와 버튼을 위한 하단 패딩
-                          ),
+                          padding: const EdgeInsets.all(16),
                           itemCount: _templateItems.length,
                           onReorder: _reorderItems,
                           proxyDecorator: (child, index, animation) {
@@ -613,26 +684,20 @@ class _TemplateScreenState extends State<TemplateScreen> {
                             );
                           },
                         ),
-              ),
+                ),
               
-              // Apply Template Button - 하단 네비게이션 바와 겹치지 않도록 위치 조정
+              // 버튼과 리스트 사이 간격
+              const SizedBox(height: 16),
+              
+              // Apply Template Button - 기존 스타일로 복구
               Container(
                 width: double.infinity,
-                padding: EdgeInsets.fromLTRB(
-                  16, 
-                  16, 
-                  16, 
-                  // 배너광고(60) + 하단 네비게이션 바 여백(80) + 추가 여백(16)
-                  _isAdLoaded ? 156 : 96,
-                ),
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                ),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100), // 패딩 조정
                 child: ElevatedButton.icon(
                   onPressed: _applyTemplateFromToday,
                   icon: const Icon(Icons.play_arrow_rounded),
                   label: Text(localizations?.locale.languageCode == 'ko' ? '오늘부터 습관 템플릿 적용하기' :
-                              localizations?.locale.languageCode == 'ja' ? '今日から習慣テンプレートを適用' : 'Apply Habit Template from Today'),
+                              localizations?.locale.languageCode == 'ja' ? '今日から習慣テンプレートを適용' : 'Apply Habit Template from Today'),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     backgroundColor: Colors.white.withOpacity(0.9),
@@ -644,15 +709,6 @@ class _TemplateScreenState extends State<TemplateScreen> {
                   ),
                 ),
               ),
-              
-              // 하단 배너광고
-              if (_isAdLoaded && _bannerAd != null)
-                Container(
-                  height: 60,
-                  color: Colors.white,
-                  margin: EdgeInsets.only(bottom: 80), // 하단 네비게이션 바 여백
-                  child: AdWidget(ad: _bannerAd!),
-                ),
               
               // 키보드 여백 추가
               SizedBox(height: MediaQuery.of(context).viewInsets.bottom),

@@ -145,12 +145,39 @@ class NotificationService {
       final alarmStatus = await Permission.scheduleExactAlarm.request();
       debugPrint('Exact alarm permission status: $alarmStatus');
       
-      // 배터리 최적화 예외 요청
-      try {
-        final batteryOptimizationStatus = await Permission.ignoreBatteryOptimizations.request();
-        debugPrint('Battery optimization permission status: $batteryOptimizationStatus');
-      } catch (e) {
-        debugPrint('Battery optimization permission request failed: $e');
+    } else if (Platform.isIOS) {
+      final result = await _notifications
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+      debugPrint('iOS notification permission result: $result');
+    }
+  }
+
+  // 권한 요청과 동시에 알림 스케줄링
+  static Future<bool> requestPermissionsAndSchedule() async {
+    debugPrint('🔔 권한 요청 및 알림 설정 시작');
+    
+    if (Platform.isAndroid) {
+      // Android 13+ 알림 권한 요청
+      final status = await Permission.notification.request();
+      debugPrint('Notification permission status: $status');
+      
+      if (status.isGranted) {
+        // 정확한 알람 권한도 요청 (Android 12+)
+        final alarmStatus = await Permission.scheduleExactAlarm.request();
+        debugPrint('Exact alarm permission status: $alarmStatus');
+        
+        // 권한이 승인되면 즉시 알림 스케줄링
+        await scheduleDailyNotification();
+        debugPrint('✅ 권한 승인 후 알림 스케줄링 완료');
+        return true;
+      } else {
+        debugPrint('❌ 알림 권한이 거부됨');
+        return false;
       }
       
     } else if (Platform.isIOS) {
@@ -162,7 +189,19 @@ class NotificationService {
             sound: true,
           );
       debugPrint('iOS notification permission result: $result');
+      
+      if (result == true) {
+        // 권한이 승인되면 즉시 알림 스케줄링
+        await scheduleDailyNotification();
+        debugPrint('✅ iOS 권한 승인 후 알림 스케줄링 완료');
+        return true;
+      } else {
+        debugPrint('❌ iOS 알림 권한이 거부됨');
+        return false;
+      }
     }
+    
+    return false;
   }
 
   static void _onNotificationTapped(NotificationResponse response) {
@@ -485,11 +524,8 @@ class NotificationService {
     if (Platform.isAndroid) {
       final notificationStatus = await Permission.notification.status;
       final alarmStatus = await Permission.scheduleExactAlarm.status;
-      final batteryStatus = await Permission.ignoreBatteryOptimizations.status;
-      
       status['notification'] = notificationStatus.toString();
       status['exactAlarm'] = alarmStatus.toString();
-      status['batteryOptimization'] = batteryStatus.toString();
     } else if (Platform.isIOS) {
       status['notification'] = 'iOS - Check in Settings';
     }

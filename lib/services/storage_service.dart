@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/todo_item.dart';
 import 'package:flutter/foundation.dart';
+import 'firebase_service.dart';
 
 class StorageService {
   static const String _templateKey = 'todo_template';
@@ -10,18 +11,55 @@ class StorageService {
 
   // 템플릿 저장/불러오기
   static Future<void> saveTemplate(List<TodoItem> template) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = template.map((item) => item.toJson()).toList();
-    await prefs.setString(_templateKey, jsonEncode(jsonList));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final templateJson = jsonEncode(template.map((item) => item.toJson()).toList());
+      await prefs.setString(_templateKey, templateJson);
+      
+      print('✅ 템플릿 저장 성공: ${template.length}개 항목');
+      
+    } catch (e, stackTrace) {
+      // Firebase Crashlytics에 오류 기록
+      await FirebaseService.recordError(
+        e,
+        stackTrace,
+        reason: 'saveTemplate 메서드에서 템플릿 저장 실패',
+        fatal: false,
+      );
+      
+      print('❌ 템플릿 저장 실패: $e');
+      rethrow; // 상위 코드에서 처리할 수 있도록 다시 던짐
+    }
   }
 
   static Future<List<TodoItem>> loadTemplate() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonString = prefs.getString(_templateKey);
-    if (jsonString == null) return [];
-    
-    final jsonList = jsonDecode(jsonString) as List;
-    return jsonList.map((json) => TodoItem.fromJson(json)).toList();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final templateJson = prefs.getString(_templateKey);
+      
+      if (templateJson == null) {
+        print('📝 템플릿이 없어서 빈 리스트 반환');
+        return [];
+      }
+      
+      final List<dynamic> templateList = jsonDecode(templateJson);
+      final template = templateList.map((json) => TodoItem.fromJson(json)).toList();
+      
+      print('✅ 템플릿 로드 성공: ${template.length}개 항목');
+      return template;
+      
+    } catch (e, stackTrace) {
+      // Firebase Crashlytics에 오류 기록
+      await FirebaseService.recordError(
+        e,
+        stackTrace,
+        reason: 'loadTemplate 메서드에서 템플릿 로드 실패',
+        fatal: false,
+      );
+      
+      print('❌ 템플릿 로드 실패: $e');
+      return []; // 실패 시 빈 리스트 반환
+    }
   }
 
   // 일일 데이터 저장/불러오기 (날짜별)
