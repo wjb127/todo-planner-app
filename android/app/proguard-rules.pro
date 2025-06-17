@@ -27,4 +27,37 @@
 # 추가 Flutter 관련 규칙
 -keep class io.flutter.embedding.** { *; }
 -keep class io.flutter.embedding.engine.** { *; }
--dontwarn io.flutter.embedding.engine.deferredcomponents.** 
+-dontwarn io.flutter.embedding.engine.deferredcomponents.**
+
+# Flutter Engine
+-keep class io.flutter.embedding.** { *; }
+
+# Firebase 규칙
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
+
+# AdMob 규칙
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
+
+# 일반적인 Android 규칙
+-keepattributes *Annotation*
+-keepattributes Signature
+-keepattributes SourceFile,LineNumberTable
+
+# Kotlin 규칙
+-keep class kotlin.** { *; }
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
+-keepclassmembers class **$WhenMappings {
+    <fields>;
+}
+-keepclassmembers class kotlin.Metadata {
+    public <methods>;
+}
+
+# R8 full mode stability
+-allowaccessmodification
+-repackageclasses '' 
