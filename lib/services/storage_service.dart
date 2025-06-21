@@ -7,6 +7,7 @@ import 'firebase_service.dart';
 class StorageService {
   static const String _templateKey = 'todo_template';
   static const String _dailyDataKey = 'daily_data';
+  static const String _planDataKey = 'plan_data';
   static const String _templateAppliedDateKey = 'template_applied_date';
 
   // 템플릿 저장/불러오기
@@ -80,6 +81,25 @@ class StorageService {
         title: item.title,
         isCompleted: false,
       )).toList();
+    }
+    
+    final jsonList = jsonDecode(jsonString) as List;
+    return jsonList.map((json) => TodoItem.fromJson(json)).toList();
+  }
+
+  // 계획 데이터 저장/불러오기 (날짜별)
+  static Future<void> savePlanData(String date, List<TodoItem> plans) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonList = plans.map((item) => item.toJson()).toList();
+    await prefs.setString('$_planDataKey$date', jsonEncode(jsonList));
+  }
+
+  static Future<List<TodoItem>> loadPlanData(String date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString('$_planDataKey$date');
+    if (jsonString == null) {
+      // 해당 날짜에 계획이 없으면 빈 리스트 반환
+      return [];
     }
     
     final jsonList = jsonDecode(jsonString) as List;

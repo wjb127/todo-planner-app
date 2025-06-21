@@ -5,6 +5,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/template_screen.dart';
 import 'screens/daily_screen.dart';
+import 'screens/plan_screen.dart';
 import 'screens/statistics_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
@@ -184,6 +185,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
 
   // 각 페이지의 새로고침을 제어하기 위한 GlobalKey
   final GlobalKey _dailyKey = GlobalKey();
+  final GlobalKey _planKey = GlobalKey();
   final GlobalKey _statisticsKey = GlobalKey();
 
   late final List<Widget> _screens;
@@ -197,6 +199,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     _screens = [
       const TemplateScreen(),
       DailyScreen(key: _dailyKey),
+      PlanScreen(key: _planKey),
       StatisticsScreen(key: _statisticsKey),
     ];
   }
@@ -262,6 +265,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                 // 일일 페이지 새로고침
                 (_dailyKey.currentState as dynamic)?.refresh();
               } else if (index == 2) {
+                // 계획 페이지 새로고침
+                (_planKey.currentState as dynamic)?.refresh();
+              } else if (index == 3) {
                 // 통계 페이지 새로고침
                 (_statisticsKey.currentState as dynamic)?.refresh();
               }
@@ -281,6 +287,10 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
             BottomNavigationBarItem(
               icon: const Icon(Icons.today_rounded),
               label: localizations?.dailyTab ?? 'Daily',
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.event_note_rounded),
+              label: localizations?.locale.languageCode == 'ko' ? '계획' : 'Plan',
             ),
             BottomNavigationBarItem(
               icon: const Icon(Icons.analytics_rounded),

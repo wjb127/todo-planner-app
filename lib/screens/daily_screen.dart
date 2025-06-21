@@ -489,7 +489,7 @@ class _DailyScreenState extends State<DailyScreen> with AutomaticKeepAliveClient
                                   const SizedBox(height: 24),
                                   ElevatedButton.icon(
                                     onPressed: _loadDailyData,
-                                    icon: const Icon(Icons.refresh_rounded),
+                                    icon: const Icon(Icons.refresh_rounded, color: Colors.white),
                                     label: Text(localizations?.locale.languageCode == 'ko' ? '새로고침' :
                                                localizations?.locale.languageCode == 'ja' ? 'リフレッシュ' : 'Refresh'),
                                     style: ElevatedButton.styleFrom(
